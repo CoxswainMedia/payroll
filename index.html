@@ -1,0 +1,2213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coxswain Media — Payroll Portal</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E1B2E;--navy:#1B3A5C;--steel:#2E5F8A;--sky:#4A90C4;
+  --sky-10:#EBF4FB;--sky-20:#C8DDEF;--fog:#F2F5F9;--line:#DDE4ED;--mute:#8A97A8;
+  --white:#FFFFFF;--rust:#C0431A;--rust-10:#FAECE7;
+  --green:#1E6E4A;--green-10:#E3F2EB;--amber:#A06010;--amber-10:#FDF0DC;
+  --r:10px;--r-lg:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px}
+body{font-family:"Sora",sans-serif;background:var(--fog);color:var(--ink);min-height:100vh}
+
+/* ── LOGO ── */
+.logo-img{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.logo-img-lg{width:64px;height:64px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;display:block}
+.logo-img-sm{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0}
+
+/* ── SCREENS ── */
+.screen{display:none}.screen.active{display:block}
+
+/* ── AUTH / LANDING ── */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:var(--fog)}
+.auth-card{background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);padding:2.5rem;max-width:420px;width:100%;text-align:center}
+.auth-title{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.auth-sub{font-size:13px;color:var(--mute);margin-bottom:1.75rem;line-height:1.6}
+.auth-tabs{display:flex;background:var(--fog);border-radius:var(--r);padding:4px;gap:4px;margin-bottom:1.5rem}
+.auth-tab{flex:1;font-family:"Sora",sans-serif;font-size:13px;font-weight:500;background:none;border:none;border-radius:6px;padding:8px;cursor:pointer;color:var(--mute);transition:all .15s}
+.auth-tab.active{background:var(--white);color:var(--navy);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.auth-err{display:none;background:var(--rust-10);color:var(--rust);border-radius:var(--r);padding:10px 14px;font-size:13px;margin-top:1rem;text-align:left}
+.auth-note{background:var(--sky-10);border:1px solid var(--sky-20);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--steel);margin-bottom:1.25rem;text-align:left;line-height:1.5}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:1rem;text-align:left}
+.field label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-bottom:5px}
+.field input{width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:"Sora",sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .15s,background .15s}
+.field input:focus{border-color:var(--steel);background:var(--white)}
+.pin-row{display:flex;gap:8px}
+.pin-hint{font-size:11px;color:var(--mute);margin-top:5px;line-height:1.5}
+.divider{display:flex;align-items:center;gap:10px;margin:1rem 0}
+.divider span{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.divider hr{flex:1;border:none;border-top:1px solid var(--line)}
+
+/* ── BUTTONS ── */
+.btn{font-family:"Sora",sans-serif;font-weight:600;border:none;border-radius:var(--r);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-navy{background:var(--navy);color:#fff;font-size:14px;padding:12px 1.5rem}.btn-navy:hover{background:var(--steel)}
+.btn-steel{background:var(--steel);color:#fff;font-size:13px;padding:9px 16px}.btn-steel:hover{background:var(--sky)}
+.btn-green{background:var(--green);color:#fff;font-size:13px;padding:9px 16px}.btn-green:hover{background:#165938}
+.btn-rust{background:var(--rust);color:#fff;font-size:13px;padding:9px 16px}.btn-rust:hover{background:#a33514}
+.btn-ghost{background:var(--fog);color:var(--ink);border:1.5px solid var(--line);font-size:13px;padding:8px 14px}.btn-ghost:hover{background:var(--line)}
+.btn-icon{background:none;border:none;cursor:pointer;padding:5px 7px;border-radius:5px;font-size:14px;transition:all .1s;color:var(--mute)}
+.btn-icon:hover{background:var(--fog)}
+.btn-icon.approve:hover{background:var(--green-10);color:var(--green)}
+.btn-icon.reject:hover{background:var(--rust-10);color:var(--rust)}
+.btn-icon.edit:hover{background:var(--sky-10);color:var(--steel)}
+.btn-full{width:100%;justify-content:center}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ── HEADER ── */
+.hdr{background:var(--navy);padding:0 2rem;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.test-offset{margin-top:38px}
+.hdr-brand{display:flex;align-items:center;gap:10px}
+.hdr-name{font-size:14px;font-weight:600;color:#fff;letter-spacing:-.2px}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.45);font-family:"JetBrains Mono",monospace}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-user{font-size:12px;color:rgba(255,255,255,.6)}
+.admin-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;background:var(--rust);color:#fff;padding:2px 8px;border-radius:4px}
+
+/* ── TABS ── */
+.page-tabs{background:var(--white);border-bottom:1px solid var(--line);display:flex;gap:0;padding:0 2rem}
+.page-tab{font-family:"Sora",sans-serif;font-size:13px;font-weight:500;color:var(--mute);background:none;border:none;border-bottom:2.5px solid transparent;padding:13px 18px;cursor:pointer;transition:all .15s}
+.page-tab.active{color:var(--navy);border-bottom-color:var(--steel)}
+.page-tab:hover:not(.active){color:var(--ink)}
+
+/* ── PAGE ── */
+.page{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
+.page-wide{max-width:1200px;margin:0 auto;padding:2rem 1.5rem}
+.view{display:none}.view.active{display:block}
+
+/* ── CARD ── */
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.75rem 2rem;margin-bottom:1.25rem}
+.card-h{font-size:17px;font-weight:600;color:var(--navy);margin-bottom:3px}
+.card-sub{font-size:12px;color:var(--mute);margin-bottom:1.5rem}
+
+/* ── CYCLE BADGE ── */
+.cycle-pill{display:inline-flex;align-items:center;gap:7px;background:var(--sky-10);color:var(--steel);border:1px solid var(--sky-20);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:500;font-family:"JetBrains Mono",monospace;margin-bottom:1.5rem}
+.cycle-dot{width:6px;height:6px;border-radius:50%;background:var(--sky)}
+
+/* ── ENTRY TABLE ── */
+.tbl-outer{overflow-x:auto;margin:0 -2rem;padding:0 2rem}
+table.etbl{width:100%;border-collapse:collapse}
+table.etbl thead th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);padding:7px 8px;border-bottom:1.5px solid var(--line);text-align:left;background:var(--fog);white-space:nowrap}
+table.etbl tbody td{padding:4px 4px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.etbl tbody tr:last-child td{border-bottom:none}
+.qsel{appearance:none;background:var(--fog);border:1.5px solid var(--line);border-radius:6px;padding:7px 26px 7px 8px;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink);cursor:pointer;outline:none;transition:border-color .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238A97A8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.qsel:focus{border-color:var(--steel);background-color:var(--white)}
+input.num{width:58px;text-align:center;font-family:"JetBrains Mono",monospace;font-size:13px;background:var(--fog);border:1.5px solid var(--line);border-radius:6px;padding:7px 5px;outline:none;transition:border-color .15s}
+input.num:focus{border-color:var(--steel);background:var(--white)}
+input.txt{font-family:"Sora",sans-serif;font-size:12px;background:var(--fog);border:1.5px solid var(--line);border-radius:6px;padding:7px 8px;outline:none;width:110px;transition:border-color .15s}
+input.txt:focus{border-color:var(--steel);background:var(--white)}
+input.dat{width:132px;font-family:"JetBrains Mono",monospace;font-size:12px;background:var(--fog);border:1.5px solid var(--line);border-radius:6px;padding:7px 8px;outline:none;transition:border-color .15s}
+input.dat:focus{border-color:var(--steel);background:var(--white)}
+.row-tot{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:500;color:var(--steel);text-align:center;min-width:44px}
+.row-del{background:none;border:none;cursor:pointer;color:var(--mute);font-size:14px;padding:5px 7px;border-radius:5px;transition:all .1s}
+.row-del:hover{color:var(--rust);background:var(--rust-10)}
+.add-row{background:none;border:1.5px dashed var(--line);border-radius:var(--r);width:100%;padding:10px;font-family:"Sora",sans-serif;font-size:12px;font-weight:500;color:var(--mute);cursor:pointer;margin-top:10px;transition:all .15s}
+.add-row:hover{border-color:var(--steel);color:var(--steel);background:var(--sky-10)}
+
+/* ── TOTALS BAR ── */
+.totals{display:flex;background:var(--sky-10);border-radius:var(--r);overflow:hidden;margin:1rem 0;border:1px solid var(--sky-20)}
+.tot-cell{flex:1;text-align:center;padding:10px 8px;border-right:1px solid var(--sky-20)}
+.tot-cell:last-child{border-right:none;background:rgba(30,60,100,.05)}
+.tot-v{font-family:"JetBrains Mono",monospace;font-size:16px;font-weight:500;color:var(--navy);display:block}
+.tot-l{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-top:1px}
+.tot-cell.grand .tot-v{font-size:20px;color:var(--rust)}
+
+/* ── SUCCESS ── */
+.success-wrap{text-align:center;padding:2.5rem}
+.success-icon{width:60px;height:60px;border-radius:50%;background:var(--green-10);margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;font-size:26px}
+
+/* ── HISTORY ── */
+.cycle-group{margin-bottom:2rem}
+.cycle-group-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.cycle-group-title{font-size:13px;font-weight:600;color:var(--navy);font-family:"JetBrains Mono",monospace}
+.cycle-total-badge{font-size:12px;font-weight:600;color:var(--steel);background:var(--sky-10);padding:3px 10px;border-radius:20px}
+.entry-row{background:var(--fog);border:1px solid var(--line);border-radius:var(--r);padding:11px 14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:12px}
+.entry-date{font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:500;color:var(--navy);min-width:72px;padding-top:2px}
+.dept-chips{display:flex;flex-wrap:wrap;gap:5px}
+.dept-chip{font-size:11px;font-weight:500;background:var(--sky-10);color:var(--steel);border-radius:5px;padding:2px 8px;border:1px solid var(--sky-20)}
+.dept-chip.zero{opacity:.3}
+.entry-total{font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap;text-align:right;min-width:60px}
+.status-tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.st-pending{background:var(--amber-10);color:var(--amber)}
+.st-approved{background:var(--green-10);color:var(--green)}
+.st-rejected{background:var(--rust-10);color:var(--rust)}
+.st-late{background:#F3E8FD;color:#7B3FB5}
+.entry-notes{font-size:11px;color:var(--mute);margin-top:3px}
+
+/* ── ADMIN ── */
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.5rem}
+.stat-card{background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.1rem 1.25rem}
+.stat-v{font-family:"JetBrains Mono",monospace;font-size:28px;font-weight:500;color:var(--navy)}
+.stat-l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-top:4px}
+
+.admin-card{background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:1.5rem}
+.admin-tabs{display:flex;border-bottom:1px solid var(--line)}
+.atab{font-family:"Sora",sans-serif;font-size:13px;font-weight:500;color:var(--mute);background:none;border:none;border-bottom:2.5px solid transparent;padding:12px 18px;cursor:pointer;transition:all .15s}
+.atab.active{color:var(--navy);border-bottom-color:var(--steel)}
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line)}
+.toolbar select,.toolbar input[type=text]{font-family:"Sora",sans-serif;font-size:13px;background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;color:var(--ink);outline:none}
+.toolbar select:focus,.toolbar input[type=text]:focus{border-color:var(--steel)}
+.spacer{flex:1}
+
+/* ── ADMIN TABLE ── */
+.atbl-wrap{overflow-x:auto}
+table.atbl{width:100%;border-collapse:collapse;table-layout:fixed}
+table.atbl thead th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);padding:8px 8px;border-bottom:1.5px solid var(--line);text-align:left;background:var(--fog);white-space:nowrap;cursor:pointer;user-select:none;overflow:hidden}
+table.atbl thead th:hover{color:var(--navy)}
+table.atbl tbody tr:hover{background:var(--sky-10)}
+table.atbl tbody td{padding:8px 8px;border-bottom:1px solid var(--line);font-size:12px;vertical-align:middle;overflow:hidden}
+table.atbl tbody tr:last-child td{border-bottom:none}
+/* Column widths: Emp(160) Date(76) Cycle(94) Start/End(72) Prog(46) Promo(46) Inhouse(52) Client(46) Engrg(46) Total(46) Notes(90) Status(72) Actions(64) */
+table.atbl col.c-emp    {width:160px}
+table.atbl col.c-date   {width:76px}
+table.atbl col.c-cycle  {width:88px}
+table.atbl col.c-time   {width:72px}
+table.atbl col.c-dept   {width:46px}
+table.atbl col.c-engrg  {width:50px}
+table.atbl col.c-total  {width:50px}
+table.atbl col.c-notes  {width:90px}
+table.atbl col.c-status {width:72px}
+table.atbl col.c-actions{width:68px}
+.emp-cell{display:flex;align-items:center;gap:8px}
+.av{width:28px;height:28px;border-radius:50%;background:var(--sky-10);color:var(--steel);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+
+/* ── EDIT MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(14,27,46,.5);z-index:400;align-items:center;justify-content:center;padding:1rem}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:var(--r-lg);max-width:680px;width:100%;max-height:90vh;overflow-y:auto;padding:2rem}
+.modal-h{font-size:17px;font-weight:600;color:var(--navy);margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--mute);margin-bottom:1.5rem}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:1.5rem;flex-wrap:wrap}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.modal-grid .full{grid-column:1/-1}
+
+/* ── PENDING HIGHLIGHT ── */
+.row-pending{background:#FFFBF0}
+.row-approved{background:#F6FBF8}
+.row-rejected{background:#FFF7F5;opacity:.7}
+
+/* ── INLINE EDIT CELL ── */
+.edit-cell input{width:100%;font-family:"JetBrains Mono",monospace;font-size:12px;background:var(--white);border:1.5px solid var(--steel);border-radius:5px;padding:4px 6px;outline:none}
+
+
+
+/* ── PIN CHANGE SCREEN ── */
+.pin-change-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:var(--fog)}
+.pin-change-card{background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);padding:2.5rem;max-width:420px;width:100%;text-align:center}
+.pin-change-icon{width:56px;height:56px;border-radius:50%;background:var(--sky-10);margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;font-size:24px}
+/* ── EMPLOYEE MANAGEMENT ── */
+.emp-mgmt-table{width:100%;border-collapse:collapse}
+.emp-mgmt-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);padding:8px 10px;border-bottom:1.5px solid var(--line);text-align:left;background:var(--fog)}
+.emp-mgmt-table td{padding:10px 10px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
+.emp-mgmt-table tr:last-child td{border-bottom:none}
+.emp-mgmt-table tr:hover td{background:var(--sky-10)}
+.tag-temp{background:var(--amber-10);color:var(--amber);font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
+.tag-active{background:var(--green-10);color:var(--green);font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
+.new-emp-result{background:var(--navy);color:#fff;border-radius:var(--r);padding:1.25rem 1.5rem;margin-top:1rem;text-align:left}
+.new-emp-pin{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;letter-spacing:3px;color:#fff;display:block;margin:.5rem 0}
+.new-emp-note{font-size:12px;color:rgba(255,255,255,.6);line-height:1.5;margin-top:.5rem}
+
+/* ── FULL-TIME FORM ── */
+.ft-grid{display:grid;grid-template-columns:repeat(5,1fr) 2fr auto;gap:8px;align-items:center;margin-bottom:6px}
+.ft-grid-hdr{display:grid;grid-template-columns:repeat(5,1fr) 2fr auto;gap:8px;margin-bottom:4px}
+.ft-hdr{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)}
+.ft-calc{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:500;color:var(--steel);text-align:center}
+.ft-calc.ot{color:var(--rust);font-weight:700}
+.ot-badge{display:inline-flex;align-items:center;gap:5px;background:var(--rust-10);color:var(--rust);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600;white-space:nowrap}
+.ot-badge.ok{background:var(--green-10);color:var(--green)}
+.week-summary{display:flex;align-items:center;justify-content:space-between;background:var(--fog);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;margin:10px 0}
+.week-reg{font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:500;color:var(--navy)}
+.week-ot{font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:700;color:var(--rust)}
+.emp-type-pill{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:2px 8px;border-radius:4px;margin-left:6px}
+.pill-ft{background:#E8F4FD;color:#1565A8}
+.pill-pt{background:var(--sky-10);color:var(--steel)}
+.tag-ot{background:var(--rust-10);color:var(--rust);font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--ink);color:#fff;border-radius:var(--r);padding:11px 18px;font-size:13px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.18);transform:translateY(60px);opacity:0;transition:all .25s;z-index:999}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{background:var(--green)}.toast.err{background:var(--rust)}
+
+/* ── SPINNER ── */
+.spin-row{display:none;align-items:center;gap:8px;font-size:12px;color:var(--mute);margin-top:8px}
+.spinner{width:13px;height:13px;border:2px solid var(--line);border-top-color:var(--steel);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.empty{text-align:center;padding:3rem;color:var(--mute)}
+
+@media(max-width:640px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .hdr,.page,.page-wide{padding-left:1rem;padding-right:1rem}
+  .card{padding:1.25rem 1rem}
+  .page-tabs{padding:0 1rem}
+  .tbl-outer,.modal-grid{display:block}
+  .modal-grid .field{margin-bottom:1rem}
+}
+</style>
+</head>
+<body>
+<script>
+const LOGO_CIRCLE = "https://coxswainmedia.github.io/payroll/logo_circle.png";
+const LOGO_TALL   = "https://coxswainmedia.github.io/payroll/logo_tall.png";
+const LOGO_SRC    = LOGO_CIRCLE;
+</script>
+
+
+<!-- ═══════ LANDING / AUTH ═══════ -->
+<div id="screen-auth" class="screen active">
+<div class="auth-wrap">
+<div class="auth-card">
+  <img id="auth-logo" class="logo-img-lg" src="" alt="Coxswain Media">
+  <div class="auth-title">Coxswain Media</div>
+  <div class="auth-sub">Employee Payroll Portal</div>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" onclick="authTab('employee',this)">Employee</button>
+    <button class="auth-tab" onclick="authTab('admin',this)">Admin</button>
+  </div>
+
+  <!-- EMPLOYEE PANEL -->
+  <div id="auth-employee">
+    <div class="auth-note">Enter your email and password provided by your administrator.</div>
+    <div class="field">
+      <label>Email Address</label>
+      <input type="email" id="e-email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" class="field input" id="e-password" placeholder="Enter your password" autocomplete="current-password">
+    </div>
+    <button class="btn btn-navy btn-full" onclick="empAuth()">Continue</button>
+    <div class="spin-row" id="e-spin"><span class="spinner"></span><span id="e-spin-txt">Checking&hellip;</span></div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="auth-admin" style="display:none">
+    <div class="auth-note">Admin access is password protected. Contact your administrator if you need access.</div>
+    <div class="field">
+      <label>Admin Password</label>
+      <input type="password" id="a-pw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')adminAuth()">
+    </div>
+    <button class="btn btn-navy btn-full" onclick="adminAuth()">Sign In</button>
+  </div>
+
+  <div class="auth-err" id="auth-err">Incorrect credentials. Please try again.</div>
+</div>
+</div>
+
+<!-- ═══════ NAME REGISTRATION ═══════ -->
+<!-- ═══════ PASSWORD CHANGE SCREEN ═══════ -->
+<div id="screen-pinchange" class="screen">
+<div class="pin-change-wrap">
+<div class="pin-change-card">
+  <img class="logo-img-lg" src="" alt="Coxswain Media" id="pinchange-logo">
+  <div class="pin-change-icon">&#128274;</div>
+  <div style="font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px">Set Your Password</div>
+  <div style="font-size:13px;color:var(--mute);margin-bottom:1.5rem;line-height:1.6">Welcome! Choose a personal password before continuing.<br>You'll use it every time you log in.</div>
+  <div style="text-align:left;margin-bottom:1rem">
+    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-bottom:6px">New Password</label>
+    <div style="display:flex;gap:8px">
+      <input type="password" id="new-password" class="field input" placeholder="Choose a password" autocomplete="new-password" style="width:100%">
+    </div>
+  </div>
+  <div style="text-align:left;margin-bottom:1.25rem">
+    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-bottom:6px">Confirm Password</label>
+    <div style="display:flex;gap:8px">
+      <input type="password" id="confirm-password" class="field input" placeholder="Confirm your password" autocomplete="new-password" style="width:100%">
+    </div>
+  </div>
+  <div class="auth-err" id="pinchange-err" style="margin-bottom:1rem;display:none">Passwords do not match. Please try again.</div>
+  <button class="btn btn-navy btn-full" onclick="confirmPINChange()">Set My Password &amp; Continue</button>
+</div>
+</div>
+</div>
+
+<!-- ═══════ EMPLOYEE APP ═══════ -->
+<div id="screen-employee" class="screen">
+
+<header class="hdr">
+  <div class="hdr-brand">
+    <img class="logo-img" src="" alt="" id="emp-hdr-logo">
+    <div>
+      <div class="hdr-name">Coxswain Media</div>
+      <div class="hdr-sub" id="emp-cycle-hdr">Loading cycle&hellip;</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="hdr-user" id="emp-hdr-name"></span>
+    <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="logout()">Sign out</button>
+  </div>
+</header>
+
+<nav class="page-tabs">
+  <button class="page-tab active" id="etab-submit" onclick="empTab('submit',this)">Submit Hours</button>
+  <button class="page-tab" id="etab-history" onclick="empTab('history',this)">My Hours</button>
+</nav>
+
+<div id="eview-submit" class="view active">
+<div class="page">
+  <div id="emp-form-main">
+    <div class="card">
+      <div class="card-h">Log Your Hours</div>
+      <div class="card-sub">Add one or more days. You can submit after each shift — every submission adds to your record for the cycle.</div>
+      <div class="cycle-pill"><div class="cycle-dot"></div><span id="current-cycle-pill">Current Cycle: &hellip;</span></div>
+      <div class="tbl-outer">
+        <table class="etbl">
+          <thead><tr>
+            <th>Date</th><th>Start</th><th>End</th>
+            <th title="Programming/On-Air">Prog/OnAir</th>
+            <th>Promo</th>
+            <th title="In-House Digital">Inhouse Dig.</th>
+            <th title="Client Digital">Client Dig.</th>
+            <th title="Engineering">Engrg</th>
+            <th>Project Notes</th>
+            <th>Hrs</th><th></th>
+          </tr></thead>
+          <tbody id="entry-rows"></tbody>
+        </table>
+      </div>
+      <button class="add-row" onclick="addRow()">+ Add another day</button>
+      <div class="totals">
+        <div class="tot-cell"><span class="tot-v" id="t-prog">0.00</span><span class="tot-l">Prog/OnAir</span></div>
+        <div class="tot-cell"><span class="tot-v" id="t-promo">0.00</span><span class="tot-l">Promo</span></div>
+        <div class="tot-cell"><span class="tot-v" id="t-inhouse">0.00</span><span class="tot-l">Inhouse Dig.</span></div>
+        <div class="tot-cell"><span class="tot-v" id="t-client">0.00</span><span class="tot-l">Client Dig.</span></div>
+        <div class="tot-cell"><span class="tot-v" id="t-engrg">0.00</span><span class="tot-l">Engineering</span></div>
+        <div class="tot-cell grand"><span class="tot-v" id="t-grand">0.00</span><span class="tot-l">Total Hours</span></div>
+      </div>
+      <button class="btn btn-navy btn-full" id="submit-btn" onclick="submitHours()">Submit These Hours</button>
+      <div class="spin-row" id="submit-spin"><span class="spinner"></span><span>Saving&hellip;</span></div>
+    </div>
+  </div>
+  <div id="emp-form-success" style="display:none">
+    <div class="card success-wrap">
+      <div class="success-icon">&#10003;</div>
+      <div style="font-size:20px;font-weight:700;color:var(--navy);margin-bottom:8px">Hours Submitted!</div>
+      <div style="font-size:13px;color:var(--mute);max-width:340px;margin:0 auto 1.5rem;line-height:1.6">
+        Your entries are saved and pending admin approval. Check <strong>My Hours</strong> to track your submissions.
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-navy" onclick="logMore()">Log More Hours</button>
+        <button class="btn btn-ghost" onclick="empTab('history',document.getElementById('etab-history'))">View My Hours</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="eview-history" class="view">
+<div class="page">
+  <div class="card">
+    <div class="card-h">My Hours</div>
+    <div class="card-sub">All your submissions, grouped by pay cycle. Pending entries are awaiting admin approval.</div>
+    <div id="history-content"><div class="empty"><span class="spinner"></span> Loading&hellip;</div></div>
+  </div>
+</div>
+</div>
+
+
+<!-- ═══════ FT SUBMIT TAB ═══════ -->
+<div id="ft-view-submit" class="view" style="display:none">
+<div class="page">
+  <div id="ft-form-main">
+    <div class="card">
+      <div class="card-h">Log Your Hours</div>
+      <div class="card-sub">Enter your time in, lunch break, and time out for each day worked.</div>
+      <div class="cycle-pill"><div class="cycle-dot"></div><span id="ft-cycle-pill">Current Pay Cycle: …</span></div>
+
+      <div class="ft-grid-hdr">
+        <div class="ft-hdr">Date</div>
+        <div class="ft-hdr">Time In</div>
+        <div class="ft-hdr">Lunch Out</div>
+        <div class="ft-hdr">Lunch In</div>
+        <div class="ft-hdr">Time Out</div>
+        <div class="ft-hdr">Notes (optional)</div>
+        <div></div>
+      </div>
+      <div id="ft-entry-rows"></div>
+      <button class="add-row" onclick="ftAddRow()">+ Add another day</button>
+
+      <div class="week-summary" id="ft-week-summary">
+        <div>
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-bottom:3px">Regular Hours</div>
+          <div class="week-reg"><span id="ft-reg-hrs">0.00</span> hrs</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-bottom:3px">Overtime</div>
+          <div class="week-ot"><span id="ft-ot-hrs">0.00</span> hrs</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-bottom:3px">Total Hours</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;color:var(--navy)"><span id="ft-total-hrs">0.00</span> hrs</div>
+        </div>
+        <div id="ft-ot-flag" style="display:none">
+          <span class="ot-badge">⚠ Overtime</span>
+        </div>
+      </div>
+
+      <button class="btn btn-navy btn-full" id="ft-submit-btn" onclick="ftSubmitHours()">Submit These Hours</button>
+      <div class="spin-row" id="ft-submit-spin"><span class="spinner"></span><span>Saving…</span></div>
+    </div>
+  </div>
+
+  <div id="ft-form-success" style="display:none">
+    <div class="card success-wrap">
+      <div class="success-icon">✓</div>
+      <div style="font-size:20px;font-weight:700;color:var(--navy);margin-bottom:8px">Hours Submitted!</div>
+      <div style="font-size:13px;color:var(--mute);max-width:340px;margin:0 auto 1.5rem;line-height:1.6">
+        Your timesheet is saved and pending admin approval. Check <strong>My Hours</strong> to review your submissions.
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-navy" onclick="ftLogMore()">Log More Hours</button>
+        <button class="btn btn-ghost" onclick="empTab('history', document.getElementById('etab-history'))">View My Hours</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ FT HISTORY TAB ═══════ -->
+<div id="ft-view-history" class="view" style="display:none">
+<div class="page">
+  <div class="card">
+    <div class="card-h">My Hours</div>
+    <div class="card-sub">All your submissions grouped by pay cycle. Overtime weeks are flagged automatically.</div>
+    <div id="ft-history-content"><div class="empty"><span class="spinner"></span> Loading…</div></div>
+  </div>
+</div>
+</div>
+</div><!-- /screen-employee -->
+
+<!-- ═══════ ADMIN APP ═══════ -->
+<div id="screen-admin" class="screen">
+
+<header class="hdr">
+  <div class="hdr-brand">
+    <img class="logo-img" src="" alt="" id="adm-hdr-logo">
+    <div>
+      <div class="hdr-name">Coxswain Media <span class="admin-badge">Admin</span></div>
+      <div class="hdr-sub" id="adm-cycle-hdr"></div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="logout()">Sign out</button>
+  </div>
+</header>
+
+<nav class="page-tabs">
+  <button class="page-tab active" id="atab-bycycle" onclick="adminTab('bycycle',this)">By Cycle</button>
+  <button class="page-tab" id="atab-byemployee" onclick="adminTab('byemployee',this)">By Employee</button>
+  <button class="page-tab" id="atab-all" onclick="adminTab('all',this)">All Hours</button>
+  <button class="page-tab" id="atab-approvals" onclick="adminTab('approvals',this)">Approvals <span id="pending-badge" style="background:var(--amber);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px;display:none">0</span></button>
+  <button class="page-tab" id="atab-employees" onclick="adminTab('employees',this)">Employees</button>
+</nav>
+
+<div class="page-wide">
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-v" id="as-total">0</div><div class="stat-l">Total Entries</div></div>
+    <div class="stat-card"><div class="stat-v" id="as-pending">0</div><div class="stat-l">Pending Approval</div></div>
+    <div class="stat-card"><div class="stat-v" id="as-hrs">0.0</div><div class="stat-l">Approved Hrs (Cycle)</div></div>
+    <div class="stat-card"><div class="stat-v" id="as-emps">0</div><div class="stat-l">Employees</div></div>
+    <div class="stat-card"><div class="stat-v" id="as-ot" style="color:var(--rust)">0.0</div><div class="stat-l">OT Hrs (Cycle)</div></div>
+  </div>
+
+  <div class="admin-card">
+    <div class="admin-tabs">
+      <button class="atab active" onclick="adminSubTab('bycycle',this)">By Cycle</button>
+      <button class="atab" onclick="adminSubTab('byemployee',this)">By Employee</button>
+      <button class="atab" onclick="adminSubTab('all',this)">All Hours</button>
+      <button class="atab" onclick="adminSubTab('employees',this)">Employees</button>
+      <button class="atab" onclick="adminSubTab('approvals',this)">Approvals <span id="pending-badge-inner" style="background:var(--amber);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:2px;display:none">0</span></button>
+    </div>
+
+    <div class="toolbar">
+      <select id="adm-filter-cycle" onchange="renderAdminTab()"><option value="">All Pay Cycles</option></select>
+      <select id="adm-filter-status" onchange="renderAdminTab()">
+        <option value="">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+      <input type="text" id="adm-filter-name" placeholder="Search name&hellip;" oninput="renderAdminTab()" style="min-width:180px">
+      <div class="spacer"></div>
+      <button class="btn btn-steel" onclick="exportCSV()">Export CSV</button>
+      <button class="btn btn-ghost" onclick="openAddModal()">+ Add Entry</button>
+    </div>
+
+    <!-- Approvals pane -->
+    <div id="apane-approvals">
+      <div class="atbl-wrap">
+        <table class="atbl">
+          <colgroup>
+            <col class="c-emp"><col class="c-date"><col class="c-cycle"><col class="c-time">
+            <col class="c-dept"><col class="c-dept"><col class="c-dept"><col class="c-dept"><col class="c-engrg">
+            <col style="width:44px"><col class="c-total"><col class="c-notes"><col class="c-status"><col class="c-actions">
+          </colgroup>
+          <thead><tr>
+            <th onclick="sortBy('name')">Employee</th>
+            <th onclick="sortBy('date')">Date</th>
+            <th onclick="sortBy('cycle')">Cycle</th>
+            <th>Start&#8202;/&#8202;End</th>
+            <th onclick="sortBy('prog')" title="Programming / On-Air">Prog</th>
+            <th onclick="sortBy('promo')" title="Promo">Prmo</th>
+            <th onclick="sortBy('inhouse')" title="Inhouse Digital">InDig</th>
+            <th onclick="sortBy('client')" title="Client Digital">ClDig</th>
+            <th onclick="sortBy('engrg')" title="Engineering">Engrg</th>
+            <th onclick="sortBy('otHrs')" title="Overtime Hours">OT</th>
+            <th onclick="sortBy('total')">Total</th>
+            <th>Notes</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="tbody-approvals"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- All hours pane -->
+    <div id="apane-all" style="display:none">
+      <div class="atbl-wrap">
+        <table class="atbl">
+          <colgroup>
+            <col class="c-emp"><col class="c-date"><col class="c-cycle"><col class="c-time">
+            <col class="c-dept"><col class="c-dept"><col class="c-dept"><col class="c-dept"><col class="c-engrg">
+            <col style="width:44px"><col class="c-total"><col class="c-notes"><col class="c-status"><col class="c-actions">
+          </colgroup>
+          <thead><tr>
+            <th onclick="sortBy('name')">Employee</th>
+            <th onclick="sortBy('date')">Date</th>
+            <th onclick="sortBy('cycle')">Cycle</th>
+            <th>Start&#8202;/&#8202;End</th>
+            <th onclick="sortBy('prog')" title="Programming / On-Air">Prog</th>
+            <th onclick="sortBy('promo')" title="Promo">Prmo</th>
+            <th onclick="sortBy('inhouse')" title="Inhouse Digital">InDig</th>
+            <th onclick="sortBy('client')" title="Client Digital">ClDig</th>
+            <th onclick="sortBy('engrg')" title="Engineering">Engrg</th>
+            <th onclick="sortBy('otHrs')" title="Overtime Hours">OT</th>
+            <th onclick="sortBy('total')">Total</th>
+            <th>Notes</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="tbody-all"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- By cycle pane -->
+    <div id="apane-bycycle" style="display:none">
+      <div id="cycle-list" style="padding:1.5rem"></div>
+    </div>
+
+
+    <!-- Employees pane -->
+    <div id="apane-employees" style="display:none">
+      <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:14px;font-weight:600;color:var(--navy)">Employee Accounts</div>
+        <button class="btn btn-navy" onclick="openNewEmployeeModal()" style="font-size:13px;padding:8px 16px">+ Add Employee</button>
+      </div>
+      <div id="emp-mgmt-list" style="padding:1rem 1.5rem"></div>
+    </div>
+    <!-- By employee pane -->
+    <div id="apane-byemployee" style="display:none">
+      <div class="atbl-wrap">
+        <table class="atbl">
+          <colgroup>
+            <col style="width:155px"><col style="width:96px"><col style="width:38px">
+            <col style="width:48px"><col style="width:46px"><col style="width:48px"><col style="width:48px"><col style="width:48px">
+            <col style="width:50px"><col style="width:66px"><col style="width:66px">
+          </colgroup>
+          <thead><tr>
+            <th>Employee</th><th>Pay Cycle</th><th>Days</th>
+            <th title="Programming/On-Air">Prog</th><th>Promo</th><th title="Inhouse Digital">InDig</th>
+            <th title="Client Digital">ClDig</th><th title="Engineering">Engrg</th>
+            <th title="Overtime Hours" onclick="sortBy('otHrs')">OT Hrs</th>
+            <th>Apprvd Hrs</th><th>Pending Hrs</th>
+          </tr></thead>
+          <tbody id="tbody-byemployee"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /screen-admin -->
+
+</div>
+
+
+<!-- NEW EMPLOYEE MODAL -->
+<div class="modal-bg" id="new-emp-modal">
+<div class="modal" style="max-width:500px">
+  <div class="modal-h">Add New Employee</div>
+  <div class="modal-sub">The employee will receive a temporary password and must set their own password on first login.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1rem">
+    <div style="grid-column:1/-1">
+      <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-bottom:5px">Full Name *</label>
+      <input type="text" id="ne-name" placeholder="Jane Smith" style="width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:Sora,sans-serif;font-size:14px;outline:none" onfocus="this.style.borderColor='var(--steel)'" onblur="this.style.borderColor='var(--line)'">
+    </div>
+    <div style="grid-column:1/-1">
+      <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-bottom:5px">Email Address *</label>
+      <input type="email" id="ne-email" placeholder="jane@example.com" style="width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:Sora,sans-serif;font-size:14px;outline:none" onfocus="this.style.borderColor='var(--steel)'" onblur="this.style.borderColor='var(--line)'">
+    </div>
+    <div>
+      <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-bottom:5px">Employee Type</label>
+      <select id="ne-type" style="width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:Sora,sans-serif;font-size:14px;outline:none">
+        <option value="parttime">Part-Time</option>
+        <option value="fulltime">Full-Time</option>
+      </select>
+    </div>
+    <div>
+      <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-bottom:5px">Temporary Password</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="ne-pin" readonly style="flex:1;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;letter-spacing:3px;outline:none;color:var(--navy)">
+        <button onclick="generateTempPIN()" title="Regenerate PIN" style="background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:9px 12px;cursor:pointer;font-size:16px;color:var(--mute);flex-shrink:0;transition:all .15s" onmouseover="this.style.background='var(--line)'" onmouseout="this.style.background='var(--fog)'">&#8635;</button>
+      </div>
+    </div>
+  </div>
+  <div id="ne-result" style="display:none"></div>
+  <div class="modal-footer" id="ne-footer">
+    <button class="btn btn-ghost" onclick="closeNewEmpModal()">Cancel</button>
+    <button class="btn btn-navy" onclick="createEmployee()">Create &amp; Send Credentials</button>
+  </div>
+  <div class="modal-footer" id="ne-footer-done" style="display:none">
+    <button class="btn btn-navy btn-full" onclick="closeNewEmpModal()">Done</button>
+  </div>
+</div>
+</div>
+
+<!-- EDIT / ADD MODAL -->
+<div class="modal-bg" id="edit-modal">
+<div class="modal">
+  <div class="modal-h" id="modal-title">Edit Entry</div>
+  <div class="modal-sub" id="modal-sub">Update any field below. Changes are saved immediately.</div>
+  <div class="modal-grid" id="modal-body"></div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-rust" id="modal-delete-btn" onclick="deleteEntry()">Delete Entry</button>
+    <button class="btn btn-navy" onclick="saveModal()">Save Changes</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+console.log("✅ Coxswain Media script block loaded successfully.");
+// ════════════════════════════════════════════════
+//  CONFIG  ← fill these in before deploying
+// ════════════════════════════════════════════════
+const API_URL        = "https://script.google.com/macros/s/AKfycbyXYQXMXUUdyG-QJXQWqdC-uLfEr98kDVHhbg_LU_vBA-PeQt8JIfJOgczwqGaHU5cLuw/exec";
+const ADMIN_PASSWORD = "5@U7hST#";                  // ← must match Code.gs CONFIG.ADMIN_PASSWORD
+
+// ════════════════════════════════════════════════
+//  GAS API HELPER
+//  All calls go through here. Returns parsed JSON.
+//  Throws on network error; always resolves if GAS responds.
+// ════════════════════════════════════════════════
+async function gasCall(payload) {
+  // Use GET with encoded payload — avoids all CORS issues with GAS from
+  // external domains (Squarespace, etc). GET requests have no preflight.
+  const url = API_URL + "?data=" + encodeURIComponent(JSON.stringify(payload));
+  const resp = await fetch(url, { method: "GET" });
+  if (!resp.ok) throw new Error("Network error " + resp.status);
+  const text = await resp.text();
+  try {
+    return JSON.parse(text);
+  } catch(e) {
+    console.error("GAS response:", text.slice(0, 300));
+    throw new Error("Unexpected server response.");
+  }
+}
+
+// ════════════════════════════════════════════════
+//  PAY CYCLE
+// ════════════════════════════════════════════════
+const ANCHOR = new Date("2026-03-23T00:00:00");
+const CMS    = 14 * 86400000;
+
+function cycleForDate(d) {
+  const n = Math.floor((d - ANCHOR) / CMS);
+  const s = new Date(ANCHOR.getTime() + n * CMS);
+  const e = new Date(s.getTime() + 13 * 86400000);
+  return { s, e, label: fd(s) + " – " + fd(e) };
+}
+function fd(d) { return (d.getMonth()+1)+"/"+d.getDate()+"/"+String(d.getFullYear()).slice(2); }
+function currentCycle() { return cycleForDate(new Date()); }
+
+// ════════════════════════════════════════════════
+//  LOCAL CACHE  (GAS is source of truth;
+//  localStorage used only for test-mode dummy data)
+// ════════════════════════════════════════════════
+function ls(k, v) {
+  if (v === undefined) { try { return JSON.parse(localStorage.getItem(k)); } catch(_){ return null; } }
+  localStorage.setItem(k, JSON.stringify(v));
+}
+// Local cache — always authoritative from GAS, localStorage is a read-cache
+function getSubmissions() { return ls("cm_subs") || []; }
+function saveSubmissions(a) { ls("cm_subs", a); }
+function getEmployees()   { return ls("cm_emps") || []; }
+function saveEmployees(a) { ls("cm_emps", a); }
+
+// ════════════════════════════════════════════════
+//  SESSION
+// ════════════════════════════════════════════════
+let SESSION = null; // { name, email, pin, role }
+
+function logout() {
+  SESSION = null;
+  showScreen("auth");
+  document.getElementById("auth-err").style.display = "none";
+  document.getElementById("a-pw").value = "";
+  clearPins();
+}
+
+// ════════════════════════════════════════════════
+//  AUTH TABS
+// ════════════════════════════════════════════════
+function authTab(tab, btn) {
+  document.querySelectorAll(".auth-tab").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("auth-employee").style.display = tab === "employee" ? "block" : "none";
+  document.getElementById("auth-admin").style.display    = tab === "admin"    ? "block" : "none";
+  document.getElementById("auth-err").style.display      = "none";
+}
+
+// ════════════════════════════════════════════════
+//  EMPLOYEE AUTH
+// ════════════════════════════════════════════════
+function clearPins() {
+  const pwField = document.getElementById("e-password"); if (pwField) pwField.value = "";
+}
+function getPin() {
+  return (document.getElementById("e-password")?.value || "").trim();
+}
+
+// Password field — no digit auto-advance needed
+
+function hashPin(email, pin) {
+  const s = email.toLowerCase().trim() + "|" + pin;
+  let h = 0;
+  for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
+  return "h" + Math.abs(h).toString(36);
+}
+
+function empAuth() {
+  const email = (document.getElementById("e-email").value || "").trim().toLowerCase();
+  const pin   = getPin();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAuthErr("Enter a valid email address."); return; }
+  if (pin.length < 1) { showAuthErr("Please enter your password."); return; }
+
+  // Call GAS to authenticate
+  setAuthSpinner(true, "Checking…");
+  gasCall({ action: "empAuth", email, pin })
+    .then(data => {
+      setAuthSpinner(false);
+      if (!data.ok) { showAuthErr(data.error || "Authentication failed."); return; }
+      SESSION = {
+        name:    data.name,
+        email:   data.email,
+        pin,
+        hash:    hashPin(data.email, pin),
+        role:    "employee",
+        empType: data.empType || "parttime",
+        tempPIN: data.tempPIN || false
+      };
+      if (SESSION.tempPIN) {
+        SESSION.tempPINValue = pin;
+        showPINChangeScreen();
+        return;
+      }
+      if (SESSION.empType === "fulltime") { enterFTEmployee(); } else { enterEmployee(); }
+    })
+    .catch(() => { setAuthSpinner(false); showAuthErr("Could not reach the server. Please try again."); });
+}
+
+function setAuthSpinner(on, txt) {
+  const sp = document.getElementById("e-spin");
+  if (!sp) return;
+  sp.style.display = on ? "flex" : "none";
+  if (txt) { const t = document.getElementById("e-spin-txt"); if(t) t.textContent = txt; }
+}
+
+
+function enterEmployee() {
+  const c = currentCycle();
+  document.getElementById("emp-cycle-hdr").textContent = c.label;
+  document.getElementById("current-cycle-pill").textContent = "Current Pay Cycle: " + c.label;
+  document.getElementById("emp-hdr-name").innerHTML = SESSION.name +
+    `<span class="emp-type-pill ${SESSION.empType==='fulltime'?'pill-ft':'pill-pt'}">${SESSION.empType==='fulltime'?'Full-Time':'Part-Time'}</span>`;
+  showScreen("employee");
+  initForm();
+}
+
+// ════════════════════════════════════════════════
+//  ADMIN AUTH
+// ════════════════════════════════════════════════
+function adminAuth() {
+  const pw = (document.getElementById("a-pw").value || "").trim();
+  console.log("adminAuth: pw length:", pw.length, "ADMIN_PASSWORD length:", ADMIN_PASSWORD.length);
+  console.log("adminAuth: match:", pw === ADMIN_PASSWORD);
+  if (pw !== ADMIN_PASSWORD) {
+    showAuthErr("Incorrect admin password.");
+    document.getElementById("a-pw").value = "";
+    return;
+  }
+  console.log("adminAuth: password matched, calling GAS...");
+  gasCall({ action: "adminAuth", password: pw })
+    .then(data => {
+      console.log("adminAuth: GAS response:", JSON.stringify(data));
+      if (!data.ok) { showAuthErr(data.error || "Admin authentication failed."); document.getElementById("a-pw").value = ""; return; }
+      SESSION = { name: "Admin", role: "admin", password: pw };
+      console.log("adminAuth: entering admin...");
+      enterAdmin();
+    })
+    .catch(err => {
+      console.log("adminAuth: GAS failed, falling back. Error:", err);
+      SESSION = { name: "Admin", role: "admin", password: pw };
+      enterAdmin();
+    });
+}
+
+function enterAdmin() {
+  const c = currentCycle();
+  document.getElementById("adm-cycle-hdr").textContent = c.label;
+  ADMIN_PANE = "bycycle";
+  showScreen("admin");
+  loadAdminData();
+}
+
+// ════════════════════════════════════════════════
+//  SCREEN / TAB SWITCHING
+// ════════════════════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("screen-" + name).classList.add("active");
+  // Set all logo images
+  document.querySelectorAll("[id$=-logo]").forEach(img => img.src = LOGO_CIRCLE);
+  document.querySelectorAll("#auth-logo, #pinchange-logo").forEach(img => img.src = LOGO_CIRCLE);
+}
+
+function empTab(name, btn) {
+  document.querySelectorAll(".page-tab").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  const isFT = SESSION && SESSION.empType === "fulltime";
+  if (isFT) {
+    document.getElementById("ft-view-submit").classList.toggle("active", name === "submit");
+    document.getElementById("ft-view-submit").style.display  = name === "submit"  ? "block" : "none";
+    document.getElementById("ft-view-history").classList.toggle("active", name === "ft-history");
+    document.getElementById("ft-view-history").style.display = name === "ft-history" ? "block" : "none";
+    if (name === "ft-history") ftLoadHistory();
+  } else {
+    document.getElementById("eview-submit").classList.toggle("active", name === "submit");
+    document.getElementById("eview-history").classList.toggle("active", name === "history");
+    if (name === "history") loadHistory();
+  }
+}
+
+let ADMIN_PANE = "bycycle";
+function adminTab(name, btn) {
+  ADMIN_PANE = name;
+  document.querySelectorAll(".page-tab").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  activateAdminPane(name);
+}
+function adminSubTab(name, btn) {
+  ADMIN_PANE = name;
+  document.querySelectorAll(".atab").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  activateAdminPane(name);
+}
+
+function activateAdminPane(name) {
+  ["bycycle","byemployee","all","approvals","employees"].forEach(p => {
+    const el = document.getElementById("apane-" + p); if(el) el.style.display = p === name ? "block" : "none";
+  });
+  if (name === "employees") renderEmployeeManagement();
+  // Sync the active class on inner card tabs too
+  document.querySelectorAll(".atab").forEach(btn => {
+    const matches = btn.getAttribute("onclick") && btn.getAttribute("onclick").includes("'" + name + "'");
+    if (matches) btn.classList.add("active");
+  });
+  renderAdminTab();
+}
+
+function showAuthErr(msg) {
+  const el = document.getElementById("auth-err");
+  el.textContent = msg; el.style.display = "block";
+}
+
+// ════════════════════════════════════════════════
+//  QUARTER-HOUR TIME SELECT
+// ════════════════════════════════════════════════
+function makeQSel(id, val) {
+  const sel = document.createElement("select");
+  sel.className = "qsel"; sel.id = id;
+  sel.onchange  = recalc;
+  sel.innerHTML = '<option value="">—</option>';
+  for (let h = 0; h < 24; h++) {
+    for (let q = 0; q < 4; q++) {
+      const m   = q * 15;
+      const v   = String(h).padStart(2,"0") + ":" + String(m).padStart(2,"0");
+      const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+      const ap  = h < 12 ? "AM" : "PM";
+      const lbl = h12 + ":" + String(m).padStart(2,"0") + " " + ap;
+      const opt = document.createElement("option");
+      opt.value = v; opt.textContent = lbl;
+      if (v === val) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  }
+  return sel;
+}
+
+// ════════════════════════════════════════════════
+//  EMPLOYEE FORM
+// ════════════════════════════════════════════════
+let rowId = 0;
+
+function initForm() {
+  document.getElementById("entry-rows").innerHTML = "";
+  rowId = 0;
+  addRow(); addRow();
+  document.getElementById("emp-form-main").style.display    = "block";
+  document.getElementById("emp-form-success").style.display = "none";
+}
+
+function addRow() {
+  rowId++;
+  const id = rowId;
+  const today = new Date().toISOString().split("T")[0];
+  const tr = document.createElement("tr");
+  tr.id    = "erow-" + id;
+  const td = (content) => { const c = document.createElement("td"); c.appendChild(content); return c; };
+  const mkDate = () => { const i = document.createElement("input"); i.type="date"; i.className="dat"; i.value=today; i.onchange=recalc; return i; };
+  const mkNum  = (pid) => { const i = document.createElement("input"); i.type="number"; i.className="num"; i.id=pid; i.min=0; i.max=24; i.step=0.25; i.placeholder="0"; i.oninput=recalc; return i; };
+  const mkTxt  = () => { const i = document.createElement("input"); i.type="text"; i.className="txt"; i.placeholder="Notes…"; return i; };
+  const delBtn = () => { const b = document.createElement("button"); b.className="row-del"; b.textContent="✕"; b.onclick=()=>{tr.remove();recalc()}; return b; };
+  const totTd  = document.createElement("td"); totTd.className="row-tot"; totTd.textContent="—";
+
+  tr.appendChild(td(mkDate()));
+  const std = document.createElement("td"); std.appendChild(makeQSel("s"+id)); tr.appendChild(std);
+  const etd = document.createElement("td"); etd.appendChild(makeQSel("e"+id)); tr.appendChild(etd);
+  tr.appendChild(td(mkNum("p"+id)));
+  tr.appendChild(td(mkNum("pm"+id)));
+  tr.appendChild(td(mkNum("ih"+id)));
+  tr.appendChild(td(mkNum("cl"+id)));
+  tr.appendChild(td(mkNum("eg"+id)));
+  tr.appendChild(td(mkTxt()));
+  tr.appendChild(totTd);
+  const dtd = document.createElement("td"); dtd.appendChild(delBtn()); tr.appendChild(dtd);
+  document.getElementById("entry-rows").appendChild(tr);
+  recalc();
+}
+
+function recalc() {
+  let p=0,pm=0,ih=0,cl=0,eg=0;
+  document.querySelectorAll("#entry-rows tr").forEach(tr => {
+    const n   = tr.id.replace("erow-","");
+    const vp  = parseFloat(document.getElementById("p"+n)?.value)||0;
+    const vpm = parseFloat(document.getElementById("pm"+n)?.value)||0;
+    const vih = parseFloat(document.getElementById("ih"+n)?.value)||0;
+    const vcl = parseFloat(document.getElementById("cl"+n)?.value)||0;
+    const veg = parseFloat(document.getElementById("eg"+n)?.value)||0;
+    const rt  = vp+vpm+vih+vcl+veg;
+    const rtEl = tr.querySelector(".row-tot");
+    if (rtEl) rtEl.textContent = rt > 0 ? rt.toFixed(2) : "—";
+    p+=vp; pm+=vpm; ih+=vih; cl+=vcl; eg+=veg;
+  });
+  document.getElementById("t-prog").textContent    = p.toFixed(2);
+  document.getElementById("t-promo").textContent   = pm.toFixed(2);
+  document.getElementById("t-inhouse").textContent = ih.toFixed(2);
+  document.getElementById("t-client").textContent  = cl.toFixed(2);
+  document.getElementById("t-engrg").textContent   = eg.toFixed(2);
+  document.getElementById("t-grand").textContent   = (p+pm+ih+cl+eg).toFixed(2);
+}
+
+function submitHours() {
+  const entries = [];
+  document.querySelectorAll("#entry-rows tr").forEach(tr => {
+    const n   = tr.id.replace("erow-","");
+    const p   = parseFloat(document.getElementById("p"+n)?.value)||0;
+    const pm  = parseFloat(document.getElementById("pm"+n)?.value)||0;
+    const ih  = parseFloat(document.getElementById("ih"+n)?.value)||0;
+    const cl  = parseFloat(document.getElementById("cl"+n)?.value)||0;
+    const eg  = parseFloat(document.getElementById("eg"+n)?.value)||0;
+    if ((p+pm+ih+cl+eg) > 0) {
+      const inputs = tr.querySelectorAll("input[type=date]");
+      const selects = tr.querySelectorAll("select");
+      entries.push({
+        date:    inputs[0].value,
+        start:   selects[0].value,
+        end:     selects[1].value,
+        prog:p, promo:pm, inhouse:ih, client:cl, engrg:eg,
+        notes:   tr.querySelectorAll("input[type=text]")[0]?.value || ""
+      });
+    }
+  });
+  if (!entries.length) { toast("Add at least one day with hours.", "err"); return; }
+
+  const btn  = document.getElementById("submit-btn");
+  const spin = document.getElementById("submit-spin");
+  btn.disabled = true;
+  spin.style.display = "flex";
+
+
+  // Real mode: send to GAS
+  gasCall({
+    action:  "submitHours",
+    email:   SESSION.email,
+    pin:     SESSION.pin,
+    name:    SESSION.name,
+    empType: SESSION.empType || "parttime",
+    entries
+  })
+  .then(data => {
+    btn.disabled = false; spin.style.display = "none";
+    if (!data.ok) { toast(data.error || "Submission failed.", "err"); return; }
+    document.getElementById("emp-form-main").style.display    = "none";
+    document.getElementById("emp-form-success").style.display = "block";
+  })
+  .catch(() => {
+    btn.disabled = false; spin.style.display = "none";
+    toast("Could not reach the server. Please try again.", "err");
+  });
+}
+
+function logMore() { initForm(); }
+
+function loadHistory() {
+  const el = document.getElementById("history-content");
+  el.innerHTML = '<div class="empty">Loading…</div>';
+
+
+  gasCall({ action: "getMyHours", email: SESSION.email, pin: SESSION.pin })
+    .then(data => {
+      if (!data.ok) { el.innerHTML = '<div class="empty">Could not load history.</div>'; return; }
+      _renderHistory(el, data.entries || []);
+    })
+    .catch(() => { el.innerHTML = '<div class="empty">Could not reach the server.</div>'; });
+}
+
+function _renderHistory(el, subs) {
+  if (!subs.length) { el.innerHTML = '<div class="empty">No hours submitted yet.</div>'; return; }
+  const byCycle = {};
+  subs.forEach(s => { if (!byCycle[s.cycle]) byCycle[s.cycle]=[]; byCycle[s.cycle].push(s); });
+  const sorted = Object.keys(byCycle).sort((a,b) => {
+    const da = new Date(byCycle[a][0].submittedAt), db = new Date(byCycle[b][0].submittedAt);
+    return db - da;
+  });
+  el.innerHTML = sorted.map(cycle => {
+    const rows = byCycle[cycle];
+    const approved = rows.filter(r=>r.status==="approved").reduce((a,r)=>a+(parseFloat(r.total)||0),0);
+    const pending  = rows.filter(r=>r.status==="pending").reduce((a,r)=>a+(parseFloat(r.total)||0),0);
+    const rowsHtml = rows.map(r => `
+      <div class="entry-row">
+        <div class="entry-date">${r.date}<br><span style="font-size:10px;color:var(--mute)">${r.start ? to12(r.start) : ""}${r.end ? " – "+to12(r.end) : ""}</span></div>
+        <div style="flex:1">
+          <div class="dept-chips">
+            <span class="dept-chip ${!r.prog?"zero":""}">Prog: ${(parseFloat(r.prog)||0).toFixed(2)}</span>
+            <span class="dept-chip ${!r.promo?"zero":""}">Promo: ${(parseFloat(r.promo)||0).toFixed(2)}</span>
+            <span class="dept-chip ${!r.inhouse?"zero":""}">InDig: ${(parseFloat(r.inhouse)||0).toFixed(2)}</span>
+            <span class="dept-chip ${!r.client?"zero":""}">ClDig: ${(parseFloat(r.client)||0).toFixed(2)}</span>
+            <span class="dept-chip ${!r.engrg?"zero":""}">Engrg: ${(parseFloat(r.engrg)||0).toFixed(2)}</span>
+            ${r.late?'<span class="dept-chip" style="background:#F3E8FD;color:#7B3FB5;border-color:#D9C4F5">Late</span>':""}
+          </div>
+          ${r.notes?`<div class="entry-notes">&#x1F4DD; ${r.notes}</div>`:""}
+        </div>
+        <div style="text-align:right">
+          <div class="entry-total">${(parseFloat(r.total)||0).toFixed(2)} hrs</div>
+          <span class="status-tag st-${r.status||"pending"}">${(r.status||"pending").charAt(0).toUpperCase()+(r.status||"pending").slice(1)}</span>
+        </div>
+      </div>`).join("");
+    return `<div class="cycle-group">
+      <div class="cycle-group-hdr">
+        <div class="cycle-group-title">${cycle}</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          ${approved>0?`<span class="cycle-total-badge" style="background:var(--green-10);color:var(--green)">&#10003; ${approved.toFixed(2)} approved</span>`:""}
+          ${pending>0?`<span class="cycle-total-badge" style="background:var(--amber-10);color:var(--amber)">${pending.toFixed(2)} pending</span>`:""}
+        </div>
+      </div>
+      ${rowsHtml}
+    </div>`;
+  }).join("");
+}
+
+// ════════════════════════════════════════════════
+//  ADMIN DATA
+// ════════════════════════════════════════════════
+let SORT_KEY = "date", SORT_DIR = -1;
+
+function loadAdminData() {
+  // Show a loading state so the screen isn't blank while GAS responds
+  console.log("loadAdminData: calling GAS...");
+  gasCall({ action: "getAdminData", password: SESSION.password })
+    .then(data => {
+      console.log("loadAdminData: GAS response:", JSON.stringify(data).slice(0, 200));
+      if (!data.ok) {
+        toast(data.error || "Could not load admin data.", "err");
+        return;
+      }
+      console.log("loadAdminData: submissions:", (data.submissions||[]).length, "employees:", (data.employees||[]).length);
+      saveSubmissions(data.submissions || []);
+      saveEmployees(data.employees || []);
+      console.log("loadAdminData: calling populateCycleFilter...");
+      populateCycleFilter();
+      console.log("loadAdminData: calling updateAdminStats...");
+      updateAdminStats();
+      console.log("loadAdminData: calling activateAdminPane:", ADMIN_PANE);
+      activateAdminPane(ADMIN_PANE);
+      console.log("loadAdminData: done.");
+    })
+    .catch(err => {
+      console.error("loadAdminData error:", err);
+      toast("Could not reach the server.", "err");
+    });
+}
+
+function populateCycleFilter() {
+  const sel    = document.getElementById("adm-filter-cycle");
+  const prev   = sel.value;
+  const cycles = [...new Set(getSubmissions().map(s => s.cycle))].sort();
+  sel.innerHTML = '<option value="">All Pay Cycles</option>';
+  cycles.forEach(c => {
+    const o = document.createElement("option");
+    o.value = c; o.textContent = c;
+    if (c === prev) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+function updateAdminStats() {
+  const subs  = getSubmissions();
+  const clbl  = currentCycle().label;
+  const appHrs = subs.filter(s => s.status==="approved" && s.cycle===clbl).reduce((a,b)=>a+(b.total||0),0);
+  const pending = subs.filter(s => s.status==="pending").length;
+  const otHrs = subs.filter(s => s.status==="approved" && s.cycle===clbl && s.empType==="fulltime")
+                     .reduce((a,b) => a+(parseFloat(b.otHrs)||0), 0);
+  document.getElementById("as-total").textContent   = subs.length;
+  document.getElementById("as-pending").textContent = pending;
+  document.getElementById("as-hrs").textContent     = appHrs.toFixed(1);
+  document.getElementById("as-emps").textContent    = [...new Set(subs.map(s=>s.email))].length;
+  document.getElementById("as-ot").textContent      = otHrs.toFixed(1);
+  [document.getElementById("pending-badge"), document.getElementById("pending-badge-inner")].forEach(pb => {
+    if (!pb) return;
+    if (pending > 0) { pb.textContent = pending; pb.style.display = "inline"; }
+    else pb.style.display = "none";
+  });
+}
+
+function filtered() {
+  const cyc  = document.getElementById("adm-filter-cycle").value;
+  const stat = document.getElementById("adm-filter-status").value;
+  const name = document.getElementById("adm-filter-name").value.toLowerCase();
+  return getSubmissions().filter(s => {
+    if (cyc  && s.cycle !== cyc) return false;
+    if (stat && (s.status||"pending") !== stat) return false;
+    if (name && !(s.name||"").toLowerCase().includes(name)) return false;
+    return true;
+  });
+}
+
+function sortBy(key) {
+  SORT_DIR = SORT_KEY === key ? SORT_DIR * -1 : -1; SORT_KEY = key;
+  renderAdminTab();
+}
+
+function sortedFiltered() {
+  const numK = ["total","prog","promo","inhouse","client","engrg","otHrs","regularHrs"];
+  return filtered().sort((a,b) => {
+    if (numK.includes(SORT_KEY))
+      return SORT_DIR * ((parseFloat(a[SORT_KEY])||0) - (parseFloat(b[SORT_KEY])||0));
+    return SORT_DIR * String(a[SORT_KEY]||"").localeCompare(String(b[SORT_KEY]||""));
+  });
+}
+
+function renderAdminTab() {
+  if (ADMIN_PANE === "approvals")   renderApprovals();
+  if (ADMIN_PANE === "all")         renderAll();
+  if (ADMIN_PANE === "bycycle")     renderByCycle();
+  if (ADMIN_PANE === "byemployee")  renderByEmployee();
+}
+
+// ════════════════════════════════════════════════
+//  ADMIN TABLE ROWS
+// ════════════════════════════════════════════════
+function entryRow(s, showAll) {
+  const init = (s.name||"?").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+  const dt   = s.submittedAt ? new Date(s.submittedAt).toLocaleDateString() : "";
+  const st   = s.status || "pending";
+  const rowClass = st === "pending" ? "row-pending" : st === "approved" ? "row-approved" : "row-rejected";
+  return `<tr class="${rowClass}" id="row-${s.id}">
+    <td><div class="emp-cell"><div class="av">${init}</div>
+      <div><div style="font-weight:500;font-size:13px">${s.name||""}
+        <span class="emp-type-pill ${s.empType==='fulltime'?'pill-ft':'pill-pt'}">${s.empType==='fulltime'?'FT':'PT'}</span>
+      </div>
+      <div style="font-size:11px;color:var(--mute)">${s.email||""}</div></div></div></td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap">${s.date ? s.date.slice(5).replace('-','/') + '/' + s.date.slice(2,4) : ""}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.5">${(s.cycle||"").replace(" – ","<br>")}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.4;white-space:nowrap">${to12(s.start)}<br>${to12(s.end)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;text-align:right">${(parseFloat(s.prog)||0).toFixed(2)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;text-align:right">${(parseFloat(s.promo)||0).toFixed(2)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;text-align:right">${(parseFloat(s.inhouse)||0).toFixed(2)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;text-align:right">${(parseFloat(s.client)||0).toFixed(2)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;text-align:right">${s.empType==="fulltime"?"—":(parseFloat(s.engrg)||0).toFixed(2)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;text-align:right;color:${(parseFloat(s.otHrs)||0)>0?'var(--rust)':'inherit'}">${(parseFloat(s.otHrs)||0)>0?(parseFloat(s.otHrs)||0).toFixed(2):"—"}</td>
+    <td style="font-family:'JetBrains Mono',monospace;text-align:right;font-weight:600">${(parseFloat(s.total)||0).toFixed(2)}</td>
+    <td style="font-size:11px;color:var(--mute);max-width:120px">${s.notes||""}</td>
+    <td><span class="status-tag st-${st}">${st.charAt(0).toUpperCase()+st.slice(1)}</span>
+      ${s.late?'<br><span class="status-tag" style="background:#F3E8FD;color:#7B3FB5;margin-top:2px;display:inline-block">Late</span>':""}
+    </td>
+    <td style="white-space:nowrap">
+      ${st==="pending"?`<button class="btn-icon approve" title="Approve" onclick="setStatus('${s.id}','approved')">&#10003;</button>
+       <button class="btn-icon reject"  title="Reject"  onclick="setStatus('${s.id}','rejected')">&#10007;</button>`:""}
+      <button class="btn-icon edit" title="Edit" onclick="openEditModal('${s.id}')">&#9998;</button>
+    </td>
+  </tr>`;
+}
+
+function renderApprovals() {
+  const rows = sortedFiltered().filter(s => (s.status||"pending") === "pending");
+  const tb = document.getElementById("tbody-approvals");
+  tb.innerHTML = rows.length ? rows.map(s => entryRow(s)).join("") :
+    '<tr><td colspan="12" class="empty">No pending entries. All caught up!</td></tr>';
+}
+
+function renderAll() {
+  const rows = sortedFiltered();
+  const tb = document.getElementById("tbody-all");
+  tb.innerHTML = rows.length ? rows.map(s => entryRow(s)).join("") :
+    '<tr><td colspan="12" class="empty">No submissions match your filters.</td></tr>';
+}
+
+function buildCycleRow(c, data) {
+  const hasPending = (data.pending||0) > 0;
+  return `<div style="background:var(--fog);border:1px solid ${hasPending ? "var(--amber)" : "var(--line)"};border-left:3px solid ${hasPending ? "var(--amber)" : "var(--line)"};border-radius:var(--r);padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--sky-10)'" onmouseout="this.style.background='var(--fog)'" onclick="drillCycle('${c.replace(/'/g,"\'")}')">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;color:var(--navy);min-width:120px;line-height:1.6">${c.replace(" – ","<br>")}</div>
+    <div style="flex:1;display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+      <div style="text-align:center"><span style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:500;display:block">${data.entries}</span><span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)">Entries</span></div>
+      <div style="text-align:center"><span style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:500;display:block;color:var(--green)">${(data.approved||0).toFixed(1)}</span><span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)">Apprvd Hrs</span></div>
+      ${hasPending ? `<div style="text-align:center"><span style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:500;display:block;color:var(--amber)">${(data.pending||0).toFixed(1)}</span><span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)">Pending Hrs</span></div>` : ""}
+      <div style="text-align:center"><span style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:500;display:block">${data.emps.size}</span><span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)">Employees</span></div>
+    </div>
+    ${hasPending ? `<span style="background:var(--amber-10);color:var(--amber);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap">${Math.round(data.pending * 4) / 4} hrs pending</span>` : `<span style="background:var(--green-10);color:var(--green);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap">All approved</span>`}
+    <span style="color:var(--mute)">&rarr;</span>
+  </div>`;
+}
+
+function renderByCycle() {
+  const bc = {};
+  filtered().forEach(s => {
+    if (!bc[s.cycle]) bc[s.cycle] = { approved:0, pending:0, rejected:0, emps:new Set(), entries:0 };
+    bc[s.cycle].entries++;
+    bc[s.cycle].emps.add(s.email);
+    const st = s.status || "pending";
+    bc[s.cycle][st] = (bc[s.cycle][st]||0) + (parseFloat(s.total)||0);
+  });
+  const el   = document.getElementById("cycle-list");
+  const allKeys = Object.keys(bc).sort().reverse();
+  const keys = allKeys.slice(0, 6);
+  const hiddenCount = allKeys.length - keys.length;
+  if (!allKeys.length) { el.innerHTML = '<div class="empty">No data.</div>'; return; }
+  const moreNote = hiddenCount > 0
+    ? `<div style="text-align:center;padding:10px 0;font-size:12px;color:var(--mute)">
+        Showing 6 most recent cycles.
+        <button onclick="showAllCycles()" style="background:none;border:none;color:var(--steel);font-size:12px;cursor:pointer;font-family:Sora,sans-serif;font-weight:500;padding:0 4px;text-decoration:underline">Show all ${allKeys.length}</button>
+       </div>`
+    : "";
+  el.innerHTML = keys.map(c => `
+    <div style="background:var(--fog);border:1px solid var(--line);border-radius:var(--r);padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--sky-10)'" onmouseout="this.style.background='var(--fog)'" onclick="drillCycle('${c.replace(/'/g,"\'")}')">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:var(--navy);min-width:160px">${c}</div>
+      <div style="flex:1;display:flex;gap:20px;flex-wrap:wrap">
+        <div style="text-align:center"><span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;display:block">${bc[c].entries}</span><span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)">Entries</span></div>
+        <div style="text-align:center"><span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;display:block;color:var(--green)">${(bc[c].approved||0).toFixed(1)}</span><span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)">Approved Hrs</span></div>
+        <div style="text-align:center"><span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;display:block;color:var(--amber)">${(bc[c].pending||0).toFixed(1)}</span><span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)">Pending Hrs</span></div>
+        <div style="text-align:center"><span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;display:block">${bc[c].emps.size}</span><span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)">Employees</span></div>
+      </div>
+      <span style="color:var(--mute)">&rarr;</span>
+    </div>`).join("");
+}
+
+function drillCycle(c) {
+  document.getElementById("adm-filter-cycle").value = c;
+  ADMIN_PANE = "all";
+  // New tab order: bycycle(0), byemployee(1), all(2), approvals(3)
+  document.querySelectorAll(".atab").forEach((b,i)=>b.classList.toggle("active",i===2));
+  ["bycycle","byemployee","all","approvals"].forEach(p=>document.getElementById("apane-"+p).style.display=p==="all"?"block":"none");
+  renderAdminTab();
+}
+
+function renderByEmployee() {
+  const g = {};
+  filtered().forEach(s => {
+    const k = s.email + "||" + s.cycle;
+    if (!g[k]) g[k] = { name:s.name, email:s.email, empType:s.empType||'parttime', cycle:s.cycle, prog:0, promo:0, inhouse:0, client:0, engrg:0, ot:0, approved:0, pending:0, days:0 };
+    g[k].prog    += parseFloat(s.prog)||0;
+    g[k].promo   += parseFloat(s.promo)||0;
+    g[k].inhouse += parseFloat(s.inhouse)||0;
+    g[k].client  += parseFloat(s.client)||0;
+    g[k].engrg   += parseFloat(s.engrg)||0;
+    g[k].ot      += parseFloat(s.otHrs)||0;
+    if ((s.status||"pending")==="approved") g[k].approved += parseFloat(s.total)||0;
+    else if ((s.status||"pending")==="pending") g[k].pending += parseFloat(s.total)||0;
+    g[k].days++;
+  });
+  const tb   = document.getElementById("tbody-byemployee");
+  const vals = Object.values(g).sort((a,b)=>a.name.localeCompare(b.name));
+  if (!vals.length) { tb.innerHTML='<tr><td colspan="9" class="empty">No data.</td></tr>'; return; }
+  tb.innerHTML = vals.map(e => {
+    const init = (e.name||"?").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+    return `<tr>
+      <td><div class="emp-cell"><div class="av">${init}</div>
+        <div><div style="font-weight:500">${e.name}
+          <span class="emp-type-pill ${e.empType==='fulltime'?'pill-ft':'pill-pt'}">${e.empType==='fulltime'?'FT':'PT'}</span>
+        </div>
+        <div style="font-size:11px;color:var(--mute)">${e.email}</div></div></div></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">${e.cycle}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:center">${e.days}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:right">${e.empType==='fulltime'?'—':e.prog.toFixed(2)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:right">${e.empType==='fulltime'?'—':e.promo.toFixed(2)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:right">${e.empType==='fulltime'?'—':e.inhouse.toFixed(2)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:right">${e.empType==='fulltime'?'—':e.client.toFixed(2)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:right">${e.empType==='fulltime'?'—':e.engrg.toFixed(2)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:right;font-weight:600;color:${e.ot>0?'var(--rust)':'var(--mute)'}">${e.ot>0?e.ot.toFixed(2):'—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:right;font-weight:600;color:var(--green)">${e.approved.toFixed(2)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:right;color:var(--amber)">${e.pending.toFixed(2)}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ════════════════════════════════════════════════
+//  APPROVE / REJECT
+// ════════════════════════════════════════════════
+function setStatus(id, status) {
+  // Optimistically update local cache
+  const subs = getSubmissions();
+  const idx  = subs.findIndex(s => s.id === id);
+  if (idx !== -1) {
+    subs[idx].status = status;
+    subs[idx].approvedAt = status === "approved" ? new Date().toISOString() : "";
+    saveSubmissions(subs);
+  }
+  renderAdminTab();
+  toast(status === "approved" ? "Entry approved." : "Entry rejected.", status === "approved" ? "ok" : "err");
+
+
+  gasCall({ action: "setStatus", id, status, password: SESSION.password })
+    .catch(() => toast("Status update may not have saved — check connection.", "err"));
+}
+
+
+// ════════════════════════════════════════════════
+//  EDIT / ADD MODAL
+// ════════════════════════════════════════════════
+let MODAL_ID = null;
+
+function timeOptions(sel, val) {
+  sel.innerHTML = '<option value="">—</option>';
+  for (let h = 0; h < 24; h++) {
+    for (let q = 0; q < 4; q++) {
+      const m   = q * 15;
+      const v   = String(h).padStart(2,"0") + ":" + String(m).padStart(2,"0");
+      const h12 = h===0?12:h>12?h-12:h, ap = h<12?"AM":"PM";
+      const opt = document.createElement("option");
+      opt.value = v; opt.textContent = h12+":"+String(m).padStart(2,"0")+" "+ap;
+      if (v === val) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  }
+}
+
+function openEditModal(id) {
+  const s = getSubmissions().find(e => e.id === id);
+  if (!s) return;
+  MODAL_ID = id;
+  document.getElementById("modal-title").textContent = "Edit Entry — " + s.name;
+  document.getElementById("modal-sub").textContent   = "Changes are saved immediately on click.";
+  document.getElementById("modal-delete-btn").style.display = "inline-flex";
+  buildModalForm(s);
+  document.getElementById("edit-modal").classList.add("open");
+}
+
+function openAddModal() {
+  MODAL_ID = null;
+  document.getElementById("modal-title").textContent = "Add Entry";
+  document.getElementById("modal-sub").textContent   = "Manually add a timesheet entry for any employee.";
+  document.getElementById("modal-delete-btn").style.display = "none";
+  buildModalForm(null);
+  document.getElementById("edit-modal").classList.add("open");
+}
+
+function buildModalForm(s) {
+  const emps = getEmployees();
+  const today = new Date().toISOString().split("T")[0];
+  const g = document.getElementById("modal-body");
+  const field = (label, html) => `<div class="field"><label>${label}</label>${html}</div>`;
+  const inp   = (id,type,val,placeholder="") =>
+    `<input class="field input" type="${type}" id="m-${id}" value="${val||""}" placeholder="${placeholder}"
+     style="width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:Sora,sans-serif;font-size:14px;outline:none"
+     onfocus="this.style.borderColor='var(--steel)';this.style.background='var(--white)'"
+     onblur="this.style.borderColor='var(--line)';this.style.background='var(--fog)'">`;
+  const numInp = (id,val) =>
+    `<input class="field input" type="number" id="m-${id}" value="${val||0}" min=0 max=24 step=0.25
+     style="width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:'JetBrains Mono',monospace;font-size:14px;outline:none"
+     onfocus="this.style.borderColor='var(--steel)';this.style.background='var(--white)'"
+     onblur="this.style.borderColor='var(--line)';this.style.background='var(--fog)'">`;
+
+  const empOptions = s ? `<input class="field input" type="text" id="m-name" value="${s.name||""}" style="width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:Sora,sans-serif;font-size:14px;outline:none">` : `
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <select id="m-name-sel" onchange="pickEmpFromSel(this)" style="width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:Sora,sans-serif;font-size:13px;outline:none">
+        <option value="">— Pick a registered employee, or type below —</option>
+        ${emps.map(e=>`<option value="${e.name}" data-email="${e.email}">${e.name} (${e.email})</option>`).join("")}
+      </select>
+      <input type="text" id="m-name" placeholder="Or enter any name manually" style="width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:Sora,sans-serif;font-size:14px;outline:none" onfocus="this.style.borderColor='var(--steel)';this.style.background='var(--white)'" onblur="this.style.borderColor='var(--line)';this.style.background='var(--fog)'">
+    </div>
+  `;
+
+  const statusSel = `<select id="m-status" style="width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:Sora,sans-serif;font-size:14px;outline:none">
+    <option value="pending" ${(!s||s.status==="pending")?"selected":""}>Pending</option>
+    <option value="approved" ${s?.status==="approved"?"selected":""}>Approved</option>
+    <option value="rejected" ${s?.status==="rejected"?"selected":""}>Rejected</option>
+  </select>`;
+  const empTypeSel = `<select id="m-emptype" style="width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:Sora,sans-serif;font-size:14px;outline:none">
+    <option value="parttime" ${(!s||s.empType!=="fulltime")?"selected":""}>Part-Time</option>
+    <option value="fulltime" ${s?.empType==="fulltime"?"selected":""}>Full-Time</option>
+  </select>`;
+
+  g.innerHTML = `
+    <div class="field full"><label>Employee Name</label>${empOptions}</div>
+    ${!s?`<div class="field full"><label>Employee Email</label>${inp("email","email","")} </div>`:""}
+    ${field("Work Date", inp("date","date", s?.date||today))}
+    ${field("Employee Type", empTypeSel)}
+    ${field("Status", statusSel)}
+    <div class="field"><label>Start Time</label><select id="m-start" style="width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none"></select></div>
+    <div class="field"><label>End Time</label><select id="m-end" style="width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:var(--r);padding:10px 13px;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none"></select></div>
+    ${field("Prog/OnAir Hrs", numInp("prog", s?.prog))}
+    ${field("Promo Hrs", numInp("promo", s?.promo))}
+    ${field("Inhouse Digital Hrs", numInp("inhouse", s?.inhouse))}
+    ${field("Client Digital Hrs", numInp("client", s?.client))}
+    ${field("Engineering Hrs", numInp("engrg", s?.engrg))}
+    <div class="field full">${field("Project Notes", inp("notes","text",s?.notes,"Optional notes…"))}</div>
+  `;
+  timeOptions(document.getElementById("m-start"), s?.start);
+  timeOptions(document.getElementById("m-end"),   s?.end);
+}
+
+function saveModal() {
+  const subs = getSubmissions();
+  const name  = (document.getElementById("m-name")?.value||"").trim();
+  const date  = (document.getElementById("m-date")?.value||"").trim();
+  const prog  = parseFloat(document.getElementById("m-prog")?.value)||0;
+  const promo = parseFloat(document.getElementById("m-promo")?.value)||0;
+  const inh   = parseFloat(document.getElementById("m-inhouse")?.value)||0;
+  const cli   = parseFloat(document.getElementById("m-client")?.value)||0;
+  const eng   = parseFloat(document.getElementById("m-engrg")?.value)||0;
+  const empType = document.getElementById("m-emptype")?.value || "parttime";
+
+  if (!name || !date) { toast("Name and date are required.", "err"); return; }
+
+  if (MODAL_ID) {
+    // Edit existing
+    const idx = subs.findIndex(s => s.id === MODAL_ID);
+    if (idx === -1) return;
+    const wd    = new Date(date + "T12:00:00");
+    const cycle = cycleForDate(wd);
+    const updated = {
+      ...subs[idx],
+      empType, name, date,
+      start:   document.getElementById("m-start")?.value,
+      end:     document.getElementById("m-end")?.value,
+      prog, promo, inhouse: inh, client: cli,
+      engrg:   eng,
+      total:   +(prog+promo+inh+cli+eng).toFixed(2),
+      notes:   document.getElementById("m-notes")?.value||"",
+      status:  document.getElementById("m-status")?.value||"pending",
+      cycle:   cycle.label,
+      editedAt: new Date().toISOString()
+    };
+    subs[idx] = updated;
+    saveSubmissions(subs);
+    toast("Entry updated.", "ok");
+
+
+    gasCall({ action: "editEntry", id: MODAL_ID, entry: updated, password: SESSION.password })
+      .catch(() => toast("Save may not have synced — check connection.", "err"));
+  } else {
+    // New entry (admin add)
+    const emailEl = document.getElementById("m-email");
+    const email   = (emailEl?.value||"").trim().toLowerCase();
+    const wd      = new Date(date + "T12:00:00");
+    const cycle   = cycleForDate(wd);
+    const now     = new Date();
+    const isLate  = now > new Date(cycle.e.getTime() + 86400000);
+    const newEntry = {
+      id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
+      name, email, date,
+      start:       document.getElementById("m-start")?.value||"",
+      end:         document.getElementById("m-end")?.value||"",
+      prog, promo, inhouse: inh, client: cli,
+      engrg:       eng,
+      total:       +(prog+promo+inh+cli+eng).toFixed(2),
+      notes:       document.getElementById("m-notes")?.value||"",
+      cycle:       cycle.label,
+      submittedAt: now.toISOString(),
+      late:        isLate,
+      empType,
+      status:      document.getElementById("m-status")?.value||"pending"
+    };
+    subs.push(newEntry);
+    saveSubmissions(subs);
+    toast("Entry added.", "ok");
+
+
+    gasCall({ action: "addAdminEntry", entry: newEntry, password: SESSION.password })
+      .catch(() => toast("Entry may not have synced — check connection.", "err"));
+  }
+
+  closeModal();
+  loadAdminData();
+}
+
+function deleteEntry() {
+  if (!MODAL_ID) return;
+  if (!confirm("Delete this entry? This cannot be undone.")) return;
+  const subs = getSubmissions().filter(s => s.id !== MODAL_ID);
+  saveSubmissions(subs);
+  closeModal();
+  loadAdminData();
+  toast("Entry deleted.", "ok");
+
+
+  gasCall({ action: "deleteEntry", id: MODAL_ID, password: SESSION.password })
+    .catch(() => toast("Delete may not have synced — check connection.", "err"));
+}
+
+function closeModal() {
+  document.getElementById("edit-modal").classList.remove("open");
+  MODAL_ID = null;
+}
+
+// ════════════════════════════════════════════════
+//  EXPORT
+// ════════════════════════════════════════════════
+function exportCSV() {
+  const rows = filtered();
+  if (!rows.length) { toast("No data to export.", "err"); return; }
+  const H   = ["Name","Email","Date","Start","End","Prog/OnAir","Promo","Inhouse Dig","Client Dig","Engineering","Total","Notes","Cycle","Status","Late","Submitted At","Approved At"];
+  const csv = [H, ...rows.map(s=>[s.name,s.email,s.date,s.start,s.end,s.prog,s.promo,s.inhouse,s.client,s.engrg||0,s.total,s.notes,s.cycle,s.status,s.late?"Yes":"No",s.submittedAt,s.approvedAt||""])]
+    .map(r=>r.map(v=>'"'+String(v||"").replace(/"/g,'\\"')+ '"').join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download = "Coxswain_Timesheets_" + new Date().toISOString().slice(0,10) + ".csv";
+  a.click(); toast("Exported!", "ok");
+}
+
+// ════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════
+function toast(msg, type) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className   = "toast " + (type||"") + " show";
+  setTimeout(() => t.classList.remove("show"), 3500);
+}
+
+
+
+
+// ════════════════════════════════════════════════
+//  FULL-TIME EMPLOYEE LOGIC
+// ════════════════════════════════════════════════
+
+let ftRowId = 0;
+
+function enterFTEmployee() {
+  const c = currentCycle();
+  document.getElementById("emp-cycle-hdr").textContent = c.label;
+  document.getElementById("ft-cycle-pill").textContent = "Current Pay Cycle: " + c.label;
+  // Show FT views, hide PT views
+  document.getElementById("eview-submit").style.display  = "none";
+  document.getElementById("eview-history").style.display = "none";
+  document.getElementById("ft-view-submit").style.display  = "block";
+  document.getElementById("ft-view-history").style.display = "none";
+  document.getElementById("ft-view-submit").classList.add("active");
+  // Update tabs to trigger FT history
+  document.getElementById("etab-history").onclick = function() {
+    empTab("ft-history", this);
+  };
+  showScreen("employee");
+  ftInitForm();
+}
+
+function ftInitForm() {
+  document.getElementById("ft-entry-rows").innerHTML = "";
+  ftRowId = 0;
+  ftAddRow();
+  document.getElementById("ft-form-main").style.display    = "block";
+  document.getElementById("ft-form-success").style.display = "none";
+  ftRecalc();
+}
+
+function ftAddRow() {
+  ftRowId++;
+  const id    = ftRowId;
+  const today = new Date().toISOString().split("T")[0];
+  const div   = document.createElement("div");
+  div.id       = "frow-" + id;
+  div.className = "ft-grid";
+
+  const mkDate = () => {
+    const i = document.createElement("input");
+    i.type = "date"; i.value = today; i.id = "fd-" + id;
+    i.style.cssText = "width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:6px;padding:7px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;outline:none";
+    i.onchange = ftRecalc;
+    return i;
+  };
+
+  const mkSel = (sid) => {
+    const s = makeQSel(sid, "");
+    s.onchange = ftRecalc;
+    return s;
+  };
+
+  const mkNotes = () => {
+    const i = document.createElement("input");
+    i.type = "text"; i.id = "fn-" + id; i.placeholder = "What did you work on? (optional)";
+    i.style.cssText = "width:100%;background:var(--fog);border:1.5px solid var(--line);border-radius:6px;padding:7px 8px;font-family:'Sora',sans-serif;font-size:12px;outline:none";
+    i.onfocus = () => { i.style.borderColor = "var(--steel)"; i.style.background = "var(--white)"; };
+    i.onblur  = () => { i.style.borderColor = "var(--line)";  i.style.background = "var(--fog)"; };
+    return i;
+  };
+
+  const calcDiv = document.createElement("div");
+  calcDiv.className = "ft-calc"; calcDiv.id = "fcalc-" + id; calcDiv.textContent = "—";
+
+  const delBtn = document.createElement("button");
+  delBtn.className = "row-del"; delBtn.textContent = "✕";
+  delBtn.onclick = () => { div.remove(); ftRecalc(); };
+
+  const wrap = (el) => { const d = document.createElement("div"); d.appendChild(el); return d; };
+  [mkDate(), mkSel("fti-"+id), mkSel("flo-"+id), mkSel("fli-"+id), mkSel("fto-"+id), mkNotes(), delBtn]
+    .forEach((el, i) => {
+      if (i === 5) { const d = document.createElement("div"); d.appendChild(el); div.appendChild(d); }
+      else if (i === 6) { const d = document.createElement("div"); d.appendChild(el); div.appendChild(d); }
+      else div.appendChild(wrap(el));
+    });
+  div.appendChild(calcDiv);
+
+  document.getElementById("ft-entry-rows").appendChild(div);
+  ftRecalc();
+}
+
+function ftParseHours(timeIn, lunchOut, lunchIn, timeOut) {
+  if (!timeIn || !timeOut) return null;
+  const toMins = t => { const [h,m] = t.split(":").map(Number); return h*60+m; };
+  let worked = toMins(timeOut) - toMins(timeIn);
+  if (lunchOut && lunchIn) {
+    const lunchMins = toMins(lunchIn) - toMins(lunchOut);
+    if (lunchMins > 0) worked -= lunchMins;
+  }
+  return worked > 0 ? +(worked / 60).toFixed(2) : 0;
+}
+
+function ftRecalc() {
+  let totalWorked = 0;
+  document.querySelectorAll("[id^='frow-']").forEach(row => {
+    const n   = row.id.replace("frow-","");
+    const ti  = document.getElementById("fti-"+n)?.value;
+    const lo  = document.getElementById("flo-"+n)?.value;
+    const li  = document.getElementById("fli-"+n)?.value;
+    const to  = document.getElementById("fto-"+n)?.value;
+    const hrs = ftParseHours(ti, lo, li, to);
+    const cal = document.getElementById("fcalc-"+n);
+    if (hrs !== null && hrs > 0) {
+      cal.textContent = hrs.toFixed(2) + " hrs";
+      cal.className   = hrs > 8 ? "ft-calc ot" : "ft-calc";
+    } else {
+      cal.textContent = "—";
+      cal.className   = "ft-calc";
+    }
+    totalWorked += (hrs || 0);
+  });
+
+  const reg = Math.min(totalWorked, 40);
+  const ot  = Math.max(0, totalWorked - 40);
+
+  document.getElementById("ft-reg-hrs").textContent   = reg.toFixed(2);
+  document.getElementById("ft-ot-hrs").textContent    = ot.toFixed(2);
+  document.getElementById("ft-total-hrs").textContent = totalWorked.toFixed(2);
+
+  const otFlag = document.getElementById("ft-ot-flag");
+  if (ot > 0) {
+    otFlag.style.display = "flex";
+    otFlag.innerHTML = `<span class="ot-badge">⚠ ${ot.toFixed(2)} hrs overtime</span>`;
+  } else {
+    otFlag.style.display = "none";
+  }
+
+  // Color the OT hours display
+  const otEl = document.getElementById("ft-ot-hrs").parentElement;
+  otEl.style.color = ot > 0 ? "var(--rust)" : "var(--mute)";
+}
+
+function ftSubmitHours() {
+  const entries = [];
+  document.querySelectorAll("[id^='frow-']").forEach(row => {
+    const n   = row.id.replace("frow-","");
+    const ti  = document.getElementById("fti-"+n)?.value;
+    const lo  = document.getElementById("flo-"+n)?.value;
+    const li  = document.getElementById("fli-"+n)?.value;
+    const to  = document.getElementById("fto-"+n)?.value;
+    const hrs = ftParseHours(ti, lo, li, to);
+    if (hrs && hrs > 0) {
+      entries.push({
+        date:  document.getElementById("fd-"+n).value,
+        timeIn: ti, lunchOut: lo, lunchIn: li, timeOut: to,
+        hours: hrs,
+        notes: document.getElementById("fn-"+n)?.value || ""
+      });
+    }
+  });
+
+  if (!entries.length) { toast("Add at least one day with hours.", "err"); return; }
+
+  const btn  = document.getElementById("ft-submit-btn");
+  const spin = document.getElementById("ft-submit-spin");
+  btn.disabled = true;
+  spin.style.display = "flex";
+
+  const now        = new Date();
+  const totalHours = entries.reduce((a,e) => a + e.hours, 0);
+  const regHours   = Math.min(totalHours, 40);
+  const otHours    = Math.max(0, totalHours - 40);
+
+  // Build GAS-friendly entries (map field names)
+  const gasEntries = entries.map(e => {
+    const wd     = new Date(e.date + "T12:00:00");
+    const cycle  = cycleForDate(wd);
+    const isLate = now > new Date(cycle.e.getTime() + 86400000);
+    const dayOT  = otHours > 0 ? +(e.hours / totalHours * otHours).toFixed(2) : 0;
+    const dayReg = +(e.hours - dayOT).toFixed(2);
+    return {
+      date:       e.date,
+      start:      e.timeIn,
+      end:        e.timeOut,
+      lunchOut:   e.lunchOut,
+      lunchIn:    e.lunchIn,
+      regularHrs: dayReg,
+      otHrs:      dayOT,
+      total:      +e.hours.toFixed(2),
+      notes:      e.notes,
+      late:       isLate
+    };
+  });
+
+
+  // Real mode: send to GAS
+  gasCall({
+    action:  "submitHours",
+    email:   SESSION.email,
+    pin:     SESSION.pin,
+    name:    SESSION.name,
+    empType: "fulltime",
+    entries: gasEntries
+  })
+  .then(data => {
+    btn.disabled = false; spin.style.display = "none";
+    if (!data.ok) { toast(data.error || "Submission failed.", "err"); return; }
+    document.getElementById("ft-form-main").style.display    = "none";
+    document.getElementById("ft-form-success").style.display = "block";
+  })
+  .catch(() => {
+    btn.disabled = false; spin.style.display = "none";
+    toast("Could not reach the server. Please try again.", "err");
+  });
+}
+
+function ftLogMore() { ftInitForm(); }
+
+function ftLoadHistory() {
+  const el = document.getElementById("ft-history-content");
+  el.innerHTML = '<div class="empty">Loading…</div>';
+
+
+  gasCall({ action: "getMyHours", email: SESSION.email, pin: SESSION.pin })
+    .then(data => {
+      if (!data.ok) { el.innerHTML = '<div class="empty">Could not load history.</div>'; return; }
+      _renderFTHistory(el, (data.entries || []).filter(s => s.empType === "fulltime"));
+    })
+    .catch(() => { el.innerHTML = '<div class="empty">Could not reach the server.</div>'; });
+}
+
+function _renderFTHistory(el, subs) {
+  if (!subs.length) { el.innerHTML = '<div class="empty">No hours submitted yet.</div>'; return; }
+
+  const byCycle = {};
+  subs.forEach(s => { if (!byCycle[s.cycle]) byCycle[s.cycle]=[]; byCycle[s.cycle].push(s); });
+
+  const sorted = Object.keys(byCycle).sort((a,b) => {
+    return new Date(byCycle[b][0].submittedAt) - new Date(byCycle[a][0].submittedAt);
+  });
+
+  el.innerHTML = sorted.map(cycle => {
+    const rows     = byCycle[cycle];
+    const totHrs   = rows.reduce((a,r) => a+(parseFloat(r.total)||0), 0);
+    const totOT    = rows.reduce((a,r) => a+(parseFloat(r.otHrs)||0), 0);
+    const approved = rows.filter(r => r.status==="approved").reduce((a,r) => a+(parseFloat(r.total)||0), 0);
+    const pending  = rows.filter(r => r.status==="pending").reduce((a,r)  => a+(parseFloat(r.total)||0), 0);
+
+    const rowsHtml = rows.map(r => `
+      <div class="entry-row">
+        <div class="entry-date">${r.date}<br>
+          <span style="font-size:10px;color:var(--mute)">${r.start?to12(r.start):""}</span>
+        </div>
+        <div style="flex:1">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <span class="dept-chip">In: ${r.start?to12(r.start):"—"}</span>
+            ${r.lunchOut?`<span class="dept-chip">Lunch: ${to12(r.lunchOut)}–${to12(r.lunchIn||r.lunchOut)}</span>`:""}
+            <span class="dept-chip">Out: ${r.end?to12(r.end):"—"}</span>
+            ${(parseFloat(r.otHrs)||0)>0?`<span class="dept-chip" style="background:var(--rust-10);color:var(--rust);border-color:#F5C4B3">OT: ${(parseFloat(r.otHrs)||0).toFixed(2)} hrs</span>`:""}
+            ${r.late?'<span class="dept-chip" style="background:#F3E8FD;color:#7B3FB5;border-color:#D9C4F5">Late</span>':""}
+          </div>
+          ${r.notes?`<div class="entry-notes" style="margin-top:4px">📝 ${r.notes}</div>`:""}
+        </div>
+        <div style="text-align:right">
+          <div class="entry-total">${(parseFloat(r.total)||0).toFixed(2)} hrs</div>
+          <span class="status-tag st-${r.status||"pending"}">${(r.status||"pending").charAt(0).toUpperCase()+(r.status||"pending").slice(1)}</span>
+        </div>
+      </div>`).join("");
+
+    return `<div class="cycle-group">
+      <div class="cycle-group-hdr">
+        <div class="cycle-group-title">${cycle}</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="cycle-total-badge">${totHrs.toFixed(2)} hrs total</span>
+          ${totOT>0?`<span class="cycle-total-badge" style="background:var(--rust-10);color:var(--rust)">⚠ ${totOT.toFixed(2)} OT</span>`:""}
+          ${approved>0?`<span class="cycle-total-badge" style="background:var(--green-10);color:var(--green)">✓ ${approved.toFixed(2)} approved</span>`:""}
+          ${pending>0?`<span class="cycle-total-badge" style="background:var(--amber-10);color:var(--amber)">${pending.toFixed(2)} pending</span>`:""}
+        </div>
+      </div>
+      ${rowsHtml}
+    </div>`;
+  }).join("");
+}
+
+
+function pickEmpFromSel(sel) {
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt.value) return;
+  document.getElementById("m-name").value = opt.value;
+  const emailEl = document.getElementById("m-email");
+  if (emailEl && opt.dataset.email) emailEl.value = opt.dataset.email;
+}
+
+
+// ── 12-HOUR TIME DISPLAY ─────────────────────────────────────
+function to12(t) {
+  if (!t) return "—";
+  const [hStr, mStr] = t.split(":");
+  let h = parseInt(hStr, 10);
+  const m = mStr || "00";
+  const ap = h < 12 ? "AM" : "PM";
+  if (h === 0) h = 12;
+  else if (h > 12) h -= 12;
+  return h + ":" + m + " " + ap;
+}
+
+// ════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("[id$='-logo']").forEach(img => img.src = LOGO_CIRCLE);
+  document.querySelectorAll("#auth-logo, #pinchange-logo").forEach(img => img.src = LOGO_CIRCLE);
+});
+
+// ════════════════════════════════════════════════
+//  EMAILJS CONFIG
+//  1. Sign up free at emailjs.com
+//  2. Add Email Service (Gmail, Outlook, etc.)
+//  3. Create Template — use these variables:
+//     {{to_name}} {{to_email}} {{temp_pin}} {{portal_url}} {{emp_type}}
+//  4. Replace the three placeholder values below
+// ════════════════════════════════════════════════
+const EMAILJS_SERVICE_ID  = "service_jp8qo8e";
+const EMAILJS_TEMPLATE_ID = "template_kjlw8xf";
+const EMAILJS_PUBLIC_KEY  = "ywp_2dDQ4QAc1sG7G";
+const PORTAL_URL = (function(){ try { return window.location.href.split("?")[0]; } catch(e){ return ""; } })();
+
+function sendWelcomeEmail(name, email, tempPin, empType) {
+  if (EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
+    return Promise.resolve({ status: 200, text: "not_configured" });
+  }
+  try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch(e) {}
+  return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    to_name:    name,
+    to_email:   email,
+    temp_pin:   tempPin,
+    portal_url: PORTAL_URL,
+    emp_type:   empType === "fulltime" ? "Full-Time" : "Part-Time"
+  });
+}
+
+// ════════════════════════════════════════════════
+//  ADMIN-PROVISIONED USER MANAGEMENT
+// ════════════════════════════════════════════════
+
+function generateTempPIN() {
+  // Generate a readable 8-char temp password: 4 letters + 4 digits
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz";
+  const digits = "23456789";
+  let pw = "";
+  for (let i = 0; i < 4; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+  for (let i = 0; i < 4; i++) pw += digits[Math.floor(Math.random() * digits.length)];
+  // Shuffle
+  pw = pw.split("").sort(() => Math.random() - 0.5).join("");
+  const el = document.getElementById("ne-pin");
+  if (el) el.value = pw;
+  return pw;
+}
+
+function openNewEmployeeModal() {
+  const nameEl = document.getElementById("ne-name");
+  const emailEl = document.getElementById("ne-email");
+  if (nameEl) nameEl.value = "";
+  if (emailEl) { emailEl.value = ""; emailEl.disabled = false; }
+  document.getElementById("ne-type").value = "parttime";
+  document.getElementById("ne-result").style.display = "none";
+  document.getElementById("ne-footer").style.display = "flex";
+  document.getElementById("ne-footer-done").style.display = "none";
+  const btn = document.querySelector("#ne-footer .btn-navy");
+  if (btn) { btn.textContent = "Create & Send Credentials"; btn.onclick = createEmployee; }
+  document.getElementById("new-emp-modal").querySelector(".modal-h").textContent = "Add New Employee";
+  document.getElementById("new-emp-modal").querySelector(".modal-sub").textContent = "The employee will receive a temporary PIN and must set their own PIN on first login.";
+  generateTempPIN();
+  document.getElementById("new-emp-modal").classList.add("open");
+}
+
+function closeNewEmpModal() {
+  document.getElementById("new-emp-modal").classList.remove("open");
+  const emailEl = document.getElementById("ne-email");
+  if (emailEl) emailEl.disabled = false;
+  renderEmployeeManagement();
+}
+
+async function createEmployee() {
+  const name    = (document.getElementById("ne-name").value  || "").trim();
+  const email   = (document.getElementById("ne-email").value || "").trim().toLowerCase();
+  const empType = document.getElementById("ne-type").value;
+  const tempPIN = document.getElementById("ne-pin").value;
+
+  if (!name)  { toast("Please enter a name.", "err"); return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast("Please enter a valid email.", "err"); return; }
+  if (tempPIN.length < 6) { generateTempPIN(); toast("Regenerated password — please try again.", "err"); return; }
+
+  const emps = getEmployees();
+  if (emps.find(e => e.email === email)) { toast("An employee with this email already exists.", "err"); return; }
+
+  const hash = hashPin(email, tempPIN);
+  emps.push({ email, name, hash, empType, tempPIN: true, createdAt: new Date().toISOString() });
+  saveEmployees(emps);
+
+  const resultEl = document.getElementById("ne-result");
+  const footerEl = document.getElementById("ne-footer");
+  const doneEl   = document.getElementById("ne-footer-done");
+  footerEl.style.display = "none";
+  resultEl.style.display = "block";
+  resultEl.innerHTML = '<div style="text-align:center;padding:.5rem;color:var(--mute);font-size:13px"><span class="spinner"></span> Saving…</div>';
+
+  // Save to GAS (non-test mode)
+
+  try {
+    const r = await gasCall({ action: "addEmployee", name, email, empType, tempPIN, password: SESSION.password });
+    if (!r.ok) toast(r.error || "Employee may not have saved to server.", "err");
+  } catch(e) { toast("Could not sync employee to server.", "err"); }
+
+  let emailSent = false;
+  try {
+    const res = await sendWelcomeEmail(name, email, tempPIN, empType);
+    emailSent = res.status === 200 && res.text !== "not_configured";
+  } catch(e) { emailSent = false; }
+
+  resultEl.innerHTML = `
+    <div class="new-emp-result">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.5);margin-bottom:6px">
+        ${emailSent ? "&#10003; Welcome email sent to " + email : "&#9888; EmailJS not configured &mdash; share password manually"}
+      </div>
+      <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:.75rem">${name}
+        <span style="font-size:11px;font-weight:500;opacity:.6;margin-left:6px">${empType === "fulltime" ? "Full-Time" : "Part-Time"}</span>
+      </div>
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.5);margin-bottom:4px">Temporary Password</div>
+      <span class="new-emp-pin">${tempPIN}</span>
+      <div class="new-emp-note">
+        ${emailSent
+          ? "Employee has been emailed their password and the portal link. They must set a permanent password on first login."
+          : "Copy this password and share it with " + name + " directly. They must set a permanent password on first login."}
+      </div>
+    </div>`;
+  doneEl.style.display = "flex";
+  renderEmployeeManagement();
+}
+
+function renderEmployeeManagement() {
+  const el = document.getElementById("emp-mgmt-list");
+  if (!el) return;
+  const emps = getEmployees();
+  const subs = getSubmissions();
+
+  if (!emps.length) {
+    el.innerHTML = '<div class="empty">No employees yet. Click <strong>+ Add Employee</strong> to get started.</div>';
+    return;
+  }
+
+  el.innerHTML = '<div style="overflow-x:auto"><table class="emp-mgmt-table"><thead><tr>' +
+    '<th>Name</th><th>Email</th><th>Type</th><th>Status</th><th>Entries</th><th>Added</th><th>Actions</th>' +
+    '</tr></thead><tbody>' +
+    emps.map(e => {
+      const count  = subs.filter(s => s.email === e.email).length;
+      const isTemp = !!e.tempPIN;
+      const added  = e.createdAt ? new Date(e.createdAt).toLocaleDateString() : "—";
+      return '<tr>' +
+        '<td style="font-weight:500">' + e.name + '</td>' +
+        '<td style="font-size:12px;color:var(--mute)">' + e.email + '</td>' +
+        '<td><span class="emp-type-pill ' + (e.empType==='fulltime'?'pill-ft':'pill-pt') + '">' + (e.empType==='fulltime'?'Full-Time':'Part-Time') + '</span></td>' +
+        '<td><span class="' + (isTemp?'tag-temp':'tag-active') + '">' + (isTemp?'Awaiting Login':'Active') + '</span></td>' +
+        '<td style="font-family:\'JetBrains Mono\',monospace;text-align:center">' + count + '</td>' +
+        '<td style="font-size:12px;color:var(--mute)">' + added + '</td>' +
+        '<td style="white-space:nowrap">' +
+          '<button class="btn-icon edit" title="Edit" onclick="openEditEmployeeModal(\'' + e.email.replace(/'/g, "\'\''") + '\')">&#9998;</button>' +
+          '<button class="btn-icon" title="Reset Password" onclick="resetEmployeePIN(\'" + e.email.replace(/\'/g,"\'\'") + "\', \'" + e.name.replace(/\'/g,"\'\'") + "\')" style="font-size:14px">&#128274;</button>' +
+          '<button class="btn-icon reject" title="Remove" onclick="removeEmployee(\'" + e.email.replace(/\'/g,"\'\'") + "\', \'" + e.name.replace(/\'/g,"\'\'") + "\')">&#10007;</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('') +
+    '</tbody></table></div>';
+}
+
+function resetEmployeePIN(email, name) {
+  if (!confirm("Reset password for " + name + "? They will need a new temporary password to log in.")) return;
+  const emps = getEmployees();
+  const idx  = emps.findIndex(e => e.email === email);
+  if (idx === -1) return;
+  const newPIN = generateTempPIN();
+  emps[idx].hash    = hashPin(email, newPIN);
+  emps[idx].tempPIN = true;
+  saveEmployees(emps);
+  sendWelcomeEmail(name, email, newPIN, emps[idx].empType).catch(function(){});
+  toast("New temp password for " + name + ": " + newPIN, "ok");
+  renderEmployeeManagement();
+
+
+  gasCall({ action: "resetPIN", email, newPIN, password: SESSION.password })
+    .catch(() => toast("Password reset may not have synced to server.", "err"));
+}
+
+function removeEmployee(email, name) {
+  if (!confirm("Remove " + name + "? Their timesheet history is preserved but they will no longer be able to log in.")) return;
+  saveEmployees(getEmployees().filter(e => e.email !== email));
+  renderEmployeeManagement();
+  toast(name + " removed.", "ok");
+
+
+  gasCall({ action: "removeEmployee", email, password: SESSION.password })
+    .catch(() => toast("Remove may not have synced to server.", "err"));
+}
+
+function saveEmployeeEdits(email) {
+  const emps = getEmployees();
+  const idx  = emps.findIndex(e => e.email === email);
+  if (idx === -1) return;
+  const newName = (document.getElementById("ne-name").value || "").trim();
+  if (newName) emps[idx].name = newName;
+  emps[idx].empType = document.getElementById("ne-type").value;
+  saveEmployees(emps);
+  closeNewEmpModal();
+  toast("Employee updated.", "ok");
+
+
+  gasCall({ action: "editEmployee", email, name: newName, empType: emps[idx].empType, password: SESSION.password })
+    .catch(() => toast("Update may not have synced to server.", "err"));
+}
+
+// ════════════════════════════════════════════════
+//  PIN CHANGE — FIRST LOGIN
+// ════════════════════════════════════════════════
+
+document.addEventListener("DOMContentLoaded", function() {
+  // Password fields — no digit auto-advance needed
+  // Set all logos
+  document.querySelectorAll("img[id]").forEach(function(img) {
+    if (img.id === 'auth-logo' || img.id === 'pinchange-logo') {
+      img.src = LOGO_CIRCLE;
+    } else if (img.id.includes('logo')) { img.src = LOGO_CIRCLE; }
+  });
+});
+
+function getNewPIN()     { return (document.getElementById("new-password")?.value || "").trim(); }
+function getConfirmPIN() { return (document.getElementById("confirm-password")?.value || "").trim(); }
+
+function showPINChangeScreen() {
+  const np = document.getElementById("new-password"); if (np) np.value = "";
+  const cp = document.getElementById("confirm-password"); if (cp) cp.value = "";
+  document.getElementById("pinchange-err").style.display = "none";
+  showScreen("pinchange");
+}
+
+function confirmPINChange() {
+  const newPIN     = getNewPIN();
+  const confirmPIN = getConfirmPIN();
+  const errEl      = document.getElementById("pinchange-err");
+
+  if (newPIN.length < 6) {
+    errEl.textContent = "Password must be at least 6 characters.";
+    errEl.style.display = "block"; return;
+  }
+  if (newPIN !== confirmPIN) {
+    errEl.textContent = "Passwords do not match. Please try again.";
+    errEl.style.display = "block";
+    const cp2 = document.getElementById("confirm-password"); if (cp2) { cp2.value=""; cp2.focus(); }
+    return;
+  }
+  if (SESSION.tempPINValue && newPIN === SESSION.tempPINValue) {
+    errEl.textContent = "Your new password must be different from the temporary password.";
+    errEl.style.display = "block"; return;
+  }
+
+  // Update local cache
+  const emps = getEmployees();
+  const idx  = emps.findIndex(function(e){ return e.email === SESSION.email; });
+  if (idx !== -1) {
+    emps[idx].hash    = hashPin(SESSION.email, newPIN);
+    emps[idx].tempPIN = false;
+    saveEmployees(emps);
+  }
+  SESSION.hash = hashPin(SESSION.email, newPIN);
+  SESSION.pin  = newPIN;
+  errEl.style.display = "none";
+
+  // Sync to GAS (non-test mode)
+
+  gasCall({
+    action: "changePIN",
+    email:  SESSION.email,
+    oldPin: SESSION.tempPINValue || newPIN, // server verifies old hash
+    newPin: newPIN
+  }).catch(function() {
+    // Non-fatal: local change already applied; will work until server is reached
+  });
+
+  toast("Password set! Welcome, " + SESSION.name, "ok");
+  if (SESSION.empType === "fulltime") { enterFTEmployee(); }
+  else { enterEmployee(); }
+}
+
+</script>
+</body>
+</html>

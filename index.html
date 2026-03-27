@@ -1144,14 +1144,10 @@ let SORT_KEY = "date", SORT_DIR = -1;
 
 function loadAdminData() {
   // Show a loading state so the screen isn't blank while GAS responds
-  const paneEl = document.getElementById("apane-" + ADMIN_PANE);
-  if (paneEl) paneEl.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--mute)"><span class="spinner"></span> Loading…</div>';
-
   gasCall({ action: "getAdminData", password: SESSION.password })
     .then(data => {
       if (!data.ok) {
         toast(data.error || "Could not load admin data.", "err");
-        if (paneEl) paneEl.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--rust)">Failed to load data. Check your connection and try again.</div>';
         return;
       }
       saveSubmissions(data.submissions || []);
@@ -1163,7 +1159,6 @@ function loadAdminData() {
     .catch(err => {
       console.error("loadAdminData error:", err);
       toast("Could not reach the server.", "err");
-      if (paneEl) paneEl.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--rust)">Could not reach the server. Check your connection and try reloading.</div>';
     });
 }
 

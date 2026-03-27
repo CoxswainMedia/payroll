@@ -853,21 +853,24 @@ function enterEmployee() {
 // ════════════════════════════════════════════════
 function adminAuth() {
   const pw = (document.getElementById("a-pw").value || "").trim();
-  // Quick local check first (avoids round-trip for wrong password)
+  console.log("adminAuth: pw length:", pw.length, "ADMIN_PASSWORD length:", ADMIN_PASSWORD.length);
+  console.log("adminAuth: match:", pw === ADMIN_PASSWORD);
   if (pw !== ADMIN_PASSWORD) {
     showAuthErr("Incorrect admin password.");
     document.getElementById("a-pw").value = "";
     return;
   }
-  // Confirm with GAS (validates the password server-side too)
+  console.log("adminAuth: password matched, calling GAS...");
   gasCall({ action: "adminAuth", password: pw })
     .then(data => {
+      console.log("adminAuth: GAS response:", JSON.stringify(data));
       if (!data.ok) { showAuthErr(data.error || "Admin authentication failed."); document.getElementById("a-pw").value = ""; return; }
       SESSION = { name: "Admin", role: "admin", password: pw };
+      console.log("adminAuth: entering admin...");
       enterAdmin();
     })
-    .catch(() => {
-      // Fall back to local-only auth if GAS unreachable (test/offline use)
+    .catch(err => {
+      console.log("adminAuth: GAS failed, falling back. Error:", err);
       SESSION = { name: "Admin", role: "admin", password: pw };
       enterAdmin();
     });
@@ -1144,17 +1147,24 @@ let SORT_KEY = "date", SORT_DIR = -1;
 
 function loadAdminData() {
   // Show a loading state so the screen isn't blank while GAS responds
+  console.log("loadAdminData: calling GAS...");
   gasCall({ action: "getAdminData", password: SESSION.password })
     .then(data => {
+      console.log("loadAdminData: GAS response:", JSON.stringify(data).slice(0, 200));
       if (!data.ok) {
         toast(data.error || "Could not load admin data.", "err");
         return;
       }
+      console.log("loadAdminData: submissions:", (data.submissions||[]).length, "employees:", (data.employees||[]).length);
       saveSubmissions(data.submissions || []);
       saveEmployees(data.employees || []);
+      console.log("loadAdminData: calling populateCycleFilter...");
       populateCycleFilter();
+      console.log("loadAdminData: calling updateAdminStats...");
       updateAdminStats();
+      console.log("loadAdminData: calling activateAdminPane:", ADMIN_PANE);
       activateAdminPane(ADMIN_PANE);
+      console.log("loadAdminData: done.");
     })
     .catch(err => {
       console.error("loadAdminData error:", err);
